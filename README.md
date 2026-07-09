@@ -14,16 +14,19 @@ you never need to fill it in by hand.
 ### Tab: `Clients`
 Row 1 headers (exact spelling/case, columns can be in any order after ID):
 ```
-ID | client name | phone | gender | language | created at | status
+ID | client name | phone | gender | language | platform | created at | status
 ```
+`platform` records which channel the client registered through (Walk-in, Phone Call, Website,
+Social Media, Referral, Other).
 
 ### Tab: `Appointments`
 ```
 ID | appointment number | client name | treatment name | phone number | preferred date | preferred time | status | created by
 ```
 
-> If you're upgrading an existing sheet: delete the `number` column from `Clients` and the
-> `gender` column from `Appointments`. Column order doesn't matter, only the header names.
+> If you're upgrading an existing sheet: add a `platform` column to `Clients` (delete the old
+> `number` column from `Clients` and `gender` from `Appointments` if you haven't already). Column
+> order doesn't matter, only the header names.
 
 ### Tab: `Users`
 ```
@@ -118,6 +121,15 @@ added to the `Users` sheet.
 - **Roles**: Employees see everything admins see except the Delete button (Clients &
   Appointments) and the Users page entirely; this is enforced both in the UI and again in every
   API route, so it can't be bypassed by calling the API directly.
+- **Import**: the "Import" button (next to Export) lets you bulk-upload clients or appointments
+  from an `.xlsx`/`.xls`/`.csv` file in one request (fast — one Sheets API call, not one per row).
+  Click the small download icon next to it first to get a blank template with the correct column
+  headers. Rows missing required fields, or appointment rows whose client name doesn't match an
+  existing client, are skipped and reported in a summary rather than failing the whole import.
+- **Unique phone numbers**: a client's phone number must be unique. This is checked on manual
+  create, manual edit, and CSV/Excel import alike — duplicates are rejected (a 409 error on the
+  form, or counted into "skipped" on import, including duplicates *within* the uploaded file
+  itself, not just against what's already in the sheet).
 - **Client ↔ Appointment relationship**: the "Client" field on the appointment form is a dropdown
   populated only from the `Clients` sheet — you can't type a free-text name, so appointments can
   only be created for already-registered clients. The phone number field is read-only and

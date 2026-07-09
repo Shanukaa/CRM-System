@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Modal from './Modal';
-import { GENDERS, CLIENT_STATUSES } from '@/lib/constants';
+import { GENDERS, PLATFORMS, CLIENT_STATUSES } from '@/lib/constants';
 
 export default function ClientFormModal({ initial, onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -9,6 +9,7 @@ export default function ClientFormModal({ initial, onClose, onSaved }) {
     phone: initial?.phone || '',
     gender: initial?.gender || GENDERS[0],
     language: initial?.language || '',
+    platform: initial?.platform || PLATFORMS[0],
     status: initial?.status || CLIENT_STATUSES[0],
   });
   const [saving, setSaving] = useState(false);
@@ -46,6 +47,12 @@ export default function ClientFormModal({ initial, onClose, onSaved }) {
           </select>
         </div>
         <Field label="Language" value={form.language} onChange={(v) => set('language', v)} />
+        <div>
+          <label className="block text-xs font-medium text-gray-500 mb-1">Registered Platform</label>
+          <select value={form.platform} onChange={(e) => set('platform', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            {PLATFORMS.map((p) => <option key={p}>{p}</option>)}
+          </select>
+        </div>
         <div>
           <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
           <select value={form.status} onChange={(e) => set('status', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">

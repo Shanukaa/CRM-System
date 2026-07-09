@@ -5,6 +5,7 @@ import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
 import TableSettingsMenu from '@/components/TableSettingsMenu';
+import ImportButton from '@/components/ImportButton';
 import ClientFormModal from '@/components/ClientFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { CLIENT_COLUMNS } from '@/lib/constants';
@@ -102,6 +103,25 @@ export default function ClientsPage() {
             <button onClick={() => { loadRows(); loadStats(); }} className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50" title="Refresh">
               <RefreshCw size={16} />
             </button>
+            <ImportButton
+              columns={CLIENT_COLUMNS.filter((c) => c.key !== 'created at')}
+              templateName="clients"
+              endpoint="/api/clients/import"
+              mapRow={(row) => {
+                const clientName = row['Client Name'];
+                const phone = row['Phone'];
+                if (!clientName || !phone) return null;
+                return {
+                  clientName,
+                  phone,
+                  gender: row['Gender'] || '',
+                  language: row['Language'] || '',
+                  platform: row['Registered Platform'] || '',
+                  status: row['Status'] || 'Active',
+                };
+              }}
+              onImported={() => { loadRows(); loadStats(); }}
+            />
             <TableSettingsMenu allColumns={CLIENT_COLUMNS} visible={visible} onChange={updateVisible} onReset={resetVisible} />
             <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">
               <Download size={16} /> Export

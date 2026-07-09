@@ -5,6 +5,7 @@ import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
 import TableSettingsMenu from '@/components/TableSettingsMenu';
+import ImportButton from '@/components/ImportButton';
 import AppointmentFormModal from '@/components/AppointmentFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { APPOINTMENT_COLUMNS, APPOINTMENT_STATUSES } from '@/lib/constants';
@@ -126,6 +127,24 @@ export default function AppointmentsPage() {
               <RefreshCw size={16} />
             </button>
             <TableSettingsMenu allColumns={APPOINTMENT_COLUMNS} visible={visible} onChange={updateVisible} onReset={resetVisible} />
+            <ImportButton
+              columns={APPOINTMENT_COLUMNS.filter((c) => !['appointment number', 'created by'].includes(c.key))}
+              templateName="appointments"
+              endpoint="/api/appointments/import"
+              mapRow={(row) => {
+                const clientName = row['Client Name'];
+                const preferredDate = row['Preferred Date'];
+                if (!clientName || !preferredDate) return null;
+                return {
+                  clientName,
+                  treatmentName: row['Treatment'] || '',
+                  preferredDate,
+                  preferredTime: row['Preferred Time'] || '',
+                  status: row['Status'] || 'Pending',
+                };
+              }}
+              onImported={() => { loadRows(); loadStats(); }}
+            />
             <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">
               <Download size={16} /> Export
             </button>

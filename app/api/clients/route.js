@@ -42,12 +42,19 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Client name and phone are required' }, { status: 400 });
   }
 
+  const { rows: existing } = await getSheetRows('Clients', { useCache: false });
+  const phone = String(body.phone).trim();
+  if (existing.some((r) => String(r.phone).trim() === phone)) {
+    return NextResponse.json({ error: 'A client with this phone number already exists' }, { status: 409 });
+  }
+
   const record = {
     ID: uuidv4(),
     'client name': body.clientName,
-    phone: body.phone,
+    phone,
     gender: body.gender || '',
     language: body.language || '',
+    platform: body.platform || '',
     'created at': new Date().toLocaleString('en-GB'),
     status: body.status || 'Active',
   };
