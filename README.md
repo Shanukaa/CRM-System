@@ -129,6 +129,12 @@ added to the `Users` sheet.
   Click the small download icon next to it first to get a blank template with the correct column
   headers. Rows missing required fields, or appointment rows whose client name doesn't match an
   existing client, are skipped and reported in a summary rather than failing the whole import.
+- **Structured phone input**: on the Add/Edit Client form, phone is now a country-code dropdown
+  (defaults to Sri Lanka, +94) paired with a digits-only local number field — non-numeric
+  characters are stripped as you type. The two are combined and stored as one string (e.g.
+  `+94 771234567`) in the `phone` column, same as before, so nothing else about the sheet or the
+  rest of the app needs to change. (CSV/Excel import still accepts phone numbers as free text,
+  since that data is already formatted however your source file has it.)
 - **Unique phone numbers**: a client's phone number must be unique. This is checked on manual
   create, manual edit, and CSV/Excel import alike — duplicates are rejected (a 409 error on the
   form, or counted into "skipped" on import, including duplicates *within* the uploaded file
