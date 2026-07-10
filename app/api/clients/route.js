@@ -12,6 +12,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get('page') || '1', 10);
   const q = (searchParams.get('q') || '').toLowerCase().trim();
+  const sort = searchParams.get('sort') || 'newest';
   const all = searchParams.get('all') === 'true';
 
   const { rows } = await getSheetRows('Clients');
@@ -19,7 +20,26 @@ export async function GET(req) {
   if (q) {
     filtered = filtered.filter((r) => Object.values(r).some((v) => String(v).toLowerCase().includes(q)));
   }
-  filtered = filtered.slice().reverse();
+
+  if (sort === 'oldest') {
+    filtered = filtered.slice().sort((a, b) => {
+      const da = parseDate(a['created at']);
+      const db = parseDate(b['created at']);
+      if (!da && !db) return 0;
+      if (!da) return 1;
+      if (!db) return -1;
+      return da - db;
+    });
+  } else {
+    filtered = filtered.slice().sort((a, b) => {
+      const da = parseDate(a['created at']);
+      const db = parseDate(b['created at']);
+      if (!da && !db) return 0;
+      if (!da) return 1;
+      if (!db) return -1;
+      return db - da; // newest first (default)
+    });
+  }
 
   const total = filtered.length;
   const pageRows = all ? filtered : filtered.slice((page - 1) * PAGE_SIZE, (page - 1) * PAGE_SIZE + PAGE_SIZE);
@@ -65,4 +85,10 @@ export async function POST(req) {
 function cleanRow(r) {
   const { _rowNumber, ...rest } = r;
   return rest;
+}
+
+function parseDate(v) {
+  if (!v) return null;
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
 }

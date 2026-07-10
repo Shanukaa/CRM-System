@@ -115,6 +115,11 @@ added to the `Users` sheet.
   per-row requests), with a few seconds of in-memory caching to reduce duplicate reads. Writes
   invalidate the cache immediately.
 - **Pagination**: 15 rows per page for Clients and Appointments, computed server-side.
+- **Sorting**: both tables have a sort dropdown next to search. Clients: sort by registration
+  date & time (Newest first / Oldest first). Appointments: sort by "Recently added" (default) or
+  by the actual scheduled date & time (Soonest first / Latest first) — useful since when an
+  appointment was booked and when it's actually scheduled for are two different things. Sorting
+  applies before pagination and carries through to Export.
 - **Search**: Clients has a single global search box; Appointments has global search + date
   filter + status filter, all combinable.
 - **Table settings**: column visibility is saved per-browser in `localStorage`, with a reset
