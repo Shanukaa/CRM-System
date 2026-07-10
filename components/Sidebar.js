@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, CalendarCheck, LogOut, UserCog, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, CalendarCheck, LogOut, UserCog, Menu, X, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Sidebar({ user }) {
@@ -26,21 +26,31 @@ export default function Sidebar({ user }) {
 
   return (
     <>
-      <button className="md:hidden fixed top-4 left-4 z-40 bg-white p-2 rounded-lg shadow" onClick={() => setOpen(!open)}>
+      <button
+        className="md:hidden fixed top-4 left-4 z-40 bg-slate-900 text-white p-2 rounded-xl shadow-lift"
+        onClick={() => setOpen(!open)}
+      >
         {open ? <X size={20} /> : <Menu size={20} />}
       </button>
+
       <aside
-        className={`fixed z-30 top-0 left-0 h-full w-64 bg-white border-r border-gray-200 transform ${
+        className={`fixed z-30 top-0 left-0 h-full w-64 bg-slate-900 text-slate-300 transform ${
           open ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 transition-transform duration-200`}
+        } md:translate-x-0 transition-transform duration-200 flex flex-col`}
       >
-        <div className="p-6 border-b border-gray-100">
-          <h1 className="text-lg font-bold text-indigo-600">Clinic Manager</h1>
-          <p className="text-xs text-gray-500 mt-1">
-            {user.username} · <span className="capitalize">{user.usertype}</span>
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center gap-2.5">
+            <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-700 shadow-lift">
+              <Sparkles size={17} className="text-white" />
+            </span>
+            <h1 className="text-base font-semibold text-white tracking-tight">Clinic Manager</h1>
+          </div>
+          <p className="text-xs text-slate-400 mt-3">
+            {user.username} <span className="text-slate-600">·</span> <span className="capitalize">{user.usertype}</span>
           </p>
         </div>
-        <nav className="p-4 space-y-1">
+
+        <nav className="p-3 space-y-1 flex-1">
           {links.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
@@ -48,18 +58,25 @@ export default function Sidebar({ user }) {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                  active ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'
+                className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  active
+                    ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-lift'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
                 }`}
               >
-                <Icon size={18} /> {label}
+                <Icon size={17} className={active ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'} />
+                {label}
               </Link>
             );
           })}
         </nav>
-        <div className="absolute bottom-0 w-full p-4 border-t border-gray-100">
-          <button onClick={logout} className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 w-full px-3 py-2 rounded-lg hover:bg-red-50">
-            <LogOut size={18} /> Logout
+
+        <div className="p-3 border-t border-white/10">
+          <button
+            onClick={logout}
+            className="flex items-center gap-2.5 text-sm text-slate-400 hover:text-rose-400 w-full px-3.5 py-2.5 rounded-xl hover:bg-white/5 transition-colors"
+          >
+            <LogOut size={17} /> Logout
           </button>
         </div>
       </aside>

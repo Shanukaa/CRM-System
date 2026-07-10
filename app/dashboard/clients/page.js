@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Download } from 'lucide-react';
+import { RefreshCw, Plus, Download, Users, UserCheck, UserX, Phone } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
@@ -86,21 +86,21 @@ export default function ClientsPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold text-gray-800 mb-1">Client List</h1>
-      <p className="text-sm text-gray-500 mb-6">Manage all clients registered in the system.</p>
+      <h1 className="text-xl font-bold text-slate-800 mb-1">Client List</h1>
+      <p className="text-sm text-slate-500 mb-6">Manage all clients registered in the system.</p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Clients" value={stats?.total ?? '—'} />
-        <StatCard label="Active Clients" value={stats?.active ?? '—'} accent="green" sub={growthLabel} />
-        <StatCard label="Inactive Clients" value={stats?.inactive ?? '—'} accent="red" />
-        <StatCard label="Total Contact" value={stats?.totalContact ?? '—'} accent="amber" />
+        <StatCard label="Total Clients" value={stats?.total ?? '—'} icon={Users} />
+        <StatCard label="Active Clients" value={stats?.active ?? '—'} accent="green" icon={UserCheck} sub={growthLabel} />
+        <StatCard label="Inactive Clients" value={stats?.inactive ?? '—'} accent="red" icon={UserX} />
+        <StatCard label="Total Contact" value={stats?.totalContact ?? '—'} accent="amber" icon={Phone} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 border-b border-gray-100">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-soft">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 border-b border-slate-100">
           <SearchBar value={q} onChange={setQ} placeholder="Search clients..." />
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => { loadRows(); loadStats(); }} className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50" title="Refresh">
+            <button onClick={() => { loadRows(); loadStats(); }} className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50" title="Refresh">
               <RefreshCw size={16} />
             </button>
             <ImportButton
@@ -123,10 +123,10 @@ export default function ClientsPage() {
               onImported={() => { loadRows(); loadStats(); }}
             />
             <TableSettingsMenu allColumns={CLIENT_COLUMNS} visible={visible} onChange={updateVisible} onReset={resetVisible} />
-            <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">
+            <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50">
               <Download size={16} /> Export
             </button>
-            <button onClick={() => { setEditing(null); setFormOpen(true); }} className="flex items-center gap-2 px-3 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            <button onClick={() => { setEditing(null); setFormOpen(true); }} className="flex items-center gap-2 px-3 py-2 text-sm bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl hover:shadow-lift transition-shadow">
               <Plus size={16} /> Add Client
             </button>
           </div>
@@ -135,23 +135,23 @@ export default function ClientsPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 bg-gray-50 border-b border-gray-100">
+              <tr className="text-left text-slate-500 bg-slate-50 border-b border-slate-100">
                 {visibleCols.map((c) => <th key={c.key} className="px-4 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{c.label}</th>)}
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={visibleCols.length + 1} className="text-center py-8 text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={visibleCols.length + 1} className="text-center py-8 text-slate-400">Loading...</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={visibleCols.length + 1} className="text-center py-8 text-gray-400">No clients found</td></tr>
+                <tr><td colSpan={visibleCols.length + 1} className="text-center py-8 text-slate-400">No clients found</td></tr>
               ) : (
                 rows.map((row) => (
-                  <tr key={row.ID} className="border-b border-gray-50 hover:bg-gray-50">
+                  <tr key={row.ID} className="border-b border-slate-50 hover:bg-slate-50">
                     {visibleCols.map((c) => (
                       <td key={c.key} className="px-4 py-3 whitespace-nowrap">
                         {c.key === 'status' ? (
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${row.status?.toLowerCase() === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${row.status?.toLowerCase() === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
                             {row.status}
                           </span>
                         ) : (
@@ -161,7 +161,7 @@ export default function ClientsPage() {
                     ))}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <button onClick={() => { setEditing(row); setFormOpen(true); }} className="text-indigo-600 text-xs font-medium hover:underline">Edit</button>
+                        <button onClick={() => { setEditing(row); setFormOpen(true); }} className="text-brand-600 text-xs font-medium hover:underline">Edit</button>
                         {user?.usertype === 'admin' && (
                           <button onClick={() => setDeleting(row)} className="text-rose-500 text-xs font-medium hover:underline">Delete</button>
                         )}

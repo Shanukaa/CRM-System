@@ -130,6 +130,13 @@ added to the `Users` sheet.
   create, manual edit, and CSV/Excel import alike — duplicates are rejected (a 409 error on the
   form, or counted into "skipped" on import, including duplicates *within* the uploaded file
   itself, not just against what's already in the sheet).
+- **Modern UI**: Inter font (via `next/font`, no layout shift), a dedicated `brand` color scale,
+  a dark sidebar with a gradient logo mark, and consistent rounded-2xl cards with soft shadows
+  across every page.
+- **Dashboard analytics**: four charts (via `recharts`, added to `package.json` — run `npm install`
+  after pulling this update) driven by a single `/api/stats?type=charts` call: a 14-day appointment
+  volume trend, an appointment status donut, a 6-month client growth bar chart, and a "where clients
+  come from" breakdown by registration platform.
 - **Automatic client inactivity**: a client is automatically marked `Inactive` if they haven't had
   an appointment (by preferred date) in the last 2 months — or, for a client who's never booked at
   all, if it's been 2+ months since they were registered. This runs two ways:

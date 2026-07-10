@@ -56,7 +56,7 @@ export default function ImportButton({ columns, templateName, endpoint, mapRow, 
         type="button"
         onClick={downloadTemplate}
         title="Download import template"
-        className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+        className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50"
       >
         <FileDown size={16} />
       </button>
@@ -64,7 +64,7 @@ export default function ImportButton({ columns, templateName, endpoint, mapRow, 
         type="button"
         disabled={importing}
         onClick={() => inputRef.current?.click()}
-        className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+        className="flex items-center gap-2 px-3 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50"
       >
         <Upload size={16} /> {importing ? 'Importing...' : 'Import'}
       </button>

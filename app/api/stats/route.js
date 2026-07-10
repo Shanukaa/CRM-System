@@ -10,6 +10,7 @@ export async function GET(req) {
 
   if (type === 'clients') return NextResponse.json(await clientStats());
   if (type === 'appointments') return NextResponse.json(await appointmentStats());
+  if (type === 'charts') return NextResponse.json(await chartStats());
   if (type === 'users') {
     if (session.usertype !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     return NextResponse.json(await userStats());
@@ -58,6 +59,59 @@ async function appointmentStats() {
   const total = rows.length;
 
   return { today, active, completed, total };
+}
+
+async function chartStats() {
+  const [{ rows: clients }, { rows: appts }] = await Promise.all([getSheetRows('Clients'), getSheetRows('Appointments')]);
+
+  // Appointment volume over the last 14 days (by preferred date)
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (13 - i));
+    return d;
+  });
+  const apptTrend = days.map((d) => {
+    const key = toDateKey(d);
+    const count = appts.filter((a) => toDateKey(parseDate(a['preferred date'])) === key).length;
+    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), count };
+  });
+
+  // Appointment status breakdown
+  const statusList = ['Pending', 'Confirmed', 'Completed', 'Cancelled'];
+  const apptByStatus = statusList
+    .map((status) => ({ status, count: appts.filter((a) => (a.status || '').toLowerCase() === status.toLowerCase()).length }))
+    .filter((s) => s.count > 0);
+
+  // New clients registered per month, last 6 months
+  const months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - (5 - i));
+    return d;
+  });
+  const clientsByMonth = months.map((d) => {
+    const count = clients.filter((c) => {
+      const cd = parseDate(c['created at']);
+      return cd && cd.getMonth() === d.getMonth() && cd.getFullYear() === d.getFullYear();
+    }).length;
+    return { month: d.toLocaleDateString('en-US', { month: 'short' }), count };
+  });
+
+  // Clients grouped by how they registered
+  const platformCounts = {};
+  clients.forEach((c) => {
+    const p = c.platform || 'Unspecified';
+    platformCounts[p] = (platformCounts[p] || 0) + 1;
+  });
+  const clientsByPlatform = Object.entries(platformCounts)
+    .map(([platform, count]) => ({ platform, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return { apptTrend, apptByStatus, clientsByMonth, clientsByPlatform };
+}
+
+function toDateKey(d) {
+  if (!d) return '';
+  return d.toISOString().slice(0, 10);
 }
 
 async function userStats() {

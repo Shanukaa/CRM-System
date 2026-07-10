@@ -46,15 +46,15 @@ export default function UserFormModal({ initial, onClose, onSaved }) {
           type="password"
         />
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">User Type</label>
-          <select value={form.usertype} onChange={(e) => set('usertype', e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm capitalize">
+          <label className="block text-xs font-medium text-slate-500 mb-1">User Type</label>
+          <select value={form.usertype} onChange={(e) => set('usertype', e.target.value)} className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm capitalize">
             {USER_TYPES.map((t) => <option key={t} value={t} className="capitalize">{t}</option>)}
           </select>
         </div>
         {error && <p className="text-xs text-rose-500">{error}</p>}
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
-          <button disabled={saving} type="submit" className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50">Cancel</button>
+          <button disabled={saving} type="submit" className="px-4 py-2 text-sm bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl hover:shadow-lift transition-shadow disabled:opacity-50">
             {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
@@ -66,13 +66,13 @@ export default function UserFormModal({ initial, onClose, onSaved }) {
 function Field({ label, value, onChange, required, type = 'text' }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+      <label className="block text-xs font-medium text-slate-500 mb-1">{label}</label>
       <input
         type={type}
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
       />
     </div>
   );

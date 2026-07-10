@@ -10,19 +10,19 @@ export default function Pagination({ page, totalPages, onChange }) {
 
   return (
     <div className="flex items-center gap-1 justify-end flex-wrap">
-      <button disabled={page === 1} onClick={() => onChange(1)} className="px-2.5 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40">«</button>
-      <button disabled={page === 1} onClick={() => onChange(page - 1)} className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40">Prev</button>
+      <button disabled={page === 1} onClick={() => onChange(1)} className="px-2.5 py-1.5 text-sm rounded-xl border border-slate-200 disabled:opacity-40">«</button>
+      <button disabled={page === 1} onClick={() => onChange(page - 1)} className="px-3 py-1.5 text-sm rounded-xl border border-slate-200 disabled:opacity-40">Prev</button>
       {pages.map((p) => (
         <button
           key={p}
           onClick={() => onChange(p)}
-          className={`px-3 py-1.5 text-sm rounded-lg border ${p === page ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+          className={`px-3 py-1.5 text-sm rounded-xl border ${p === page ? 'bg-brand-600 text-white border-brand-600' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
         >
           {p}
         </button>
       ))}
-      <button disabled={page === totalPages} onClick={() => onChange(page + 1)} className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40">Next</button>
-      <button disabled={page === totalPages} onClick={() => onChange(totalPages)} className="px-2.5 py-1.5 text-sm rounded-lg border border-gray-200 disabled:opacity-40">»</button>
+      <button disabled={page === totalPages} onClick={() => onChange(page + 1)} className="px-3 py-1.5 text-sm rounded-xl border border-slate-200 disabled:opacity-40">Next</button>
+      <button disabled={page === totalPages} onClick={() => onChange(totalPages)} className="px-2.5 py-1.5 text-sm rounded-xl border border-slate-200 disabled:opacity-40">»</button>
     </div>
   );
 }

@@ -31,34 +31,41 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm p-8">
-        <h1 className="text-xl font-bold text-gray-800 mb-1">Clinic Manager</h1>
-        <p className="text-sm text-gray-500 mb-6">Sign in to your account</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-brand-50 px-4">
+      <div className="bg-white rounded-2xl shadow-card border border-slate-100 w-full max-w-sm p-8">
+        <div className="flex items-center gap-2.5 mb-6">
+          <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-700 shadow-lift">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
+          </span>
+          <div>
+            <h1 className="text-lg font-semibold text-slate-800 tracking-tight">Clinic Manager</h1>
+            <p className="text-xs text-slate-500">Sign in to your account</p>
+          </div>
+        </div>
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Username</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Username</label>
             <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 focus:border-brand-400 transition-colors"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Password</label>
+            <label className="block text-xs font-medium text-slate-500 mb-1.5">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 focus:border-brand-400 transition-colors"
             />
           </div>
           {error && <p className="text-xs text-rose-500">{error}</p>}
           <button
             disabled={loading}
-            className="w-full bg-indigo-600 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-brand-600 to-brand-500 text-white rounded-xl py-2.5 text-sm font-medium hover:shadow-lift transition-shadow disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
