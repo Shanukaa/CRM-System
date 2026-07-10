@@ -38,6 +38,7 @@ export async function POST(req) {
       'phone number': client.phone || '',
       'preferred date': r.preferredDate,
       'preferred time': r.preferredTime || '',
+      platform: r.platform || '',
       status: r.status || 'Pending',
       'created by': session.username,
     });

@@ -140,6 +140,7 @@ export default function AppointmentsPage() {
                   treatmentName: row['Treatment'] || '',
                   preferredDate,
                   preferredTime: row['Preferred Time'] || '',
+                  platform: row['Booked Via'] || '',
                   status: row['Status'] || 'Pending',
                 };
               }}

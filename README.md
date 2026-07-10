@@ -21,8 +21,11 @@ Social Media, Referral, Other).
 
 ### Tab: `Appointments`
 ```
-ID | appointment number | client name | treatment name | phone number | preferred date | preferred time | status | created by
+ID | appointment number | client name | treatment name | phone number | preferred date | preferred time | platform | status | created by
 ```
+`platform` on an appointment records how *that particular booking* was made (Walk-in, Phone Call,
+Website, Social Media, Referral, Other) — separate from the client's own `platform` on the
+`Clients` tab, since a client can book differently each time.
 
 > If you're upgrading an existing sheet: add a `platform` column to `Clients` (delete the old
 > `number` column from `Clients` and `gender` from `Appointments` if you haven't already). Column
@@ -133,10 +136,11 @@ added to the `Users` sheet.
 - **Modern UI**: Inter font (via `next/font`, no layout shift), a dedicated `brand` color scale,
   a dark sidebar with a gradient logo mark, and consistent rounded-2xl cards with soft shadows
   across every page.
-- **Dashboard analytics**: four charts (via `recharts`, added to `package.json` — run `npm install`
+- **Dashboard analytics**: five charts (via `recharts`, added to `package.json` — run `npm install`
   after pulling this update) driven by a single `/api/stats?type=charts` call: a 14-day appointment
-  volume trend, an appointment status donut, a 6-month client growth bar chart, and a "where clients
-  come from" breakdown by registration platform.
+  volume trend, an appointment status donut, a 6-month client growth bar chart, a "where clients
+  come from" breakdown by client registration platform, and a "how appointments are booked"
+  breakdown by each appointment's own booking platform.
 - **Automatic client inactivity**: a client is automatically marked `Inactive` if they haven't had
   an appointment (by preferred date) in the last 2 months — or, for a client who's never booked at
   all, if it's been 2+ months since they were registered. This runs two ways:
@@ -149,11 +153,12 @@ added to the `Users` sheet.
   bookings and bulk imports) — you never need to manually reactivate someone who's just booked.
   Manually setting a client to `Inactive` yourself is respected and left alone by the automatic
   check; it only ever demotes clients that are currently `Active`, never promotes anyone.
-- **Client ↔ Appointment relationship**: on the appointment form you can find a client either way —
-  type their mobile number and the client name auto-fills once it matches (with a small suggestion
-  list while you type), or pick them by name from the dropdown, which fills the phone number in turn.
-  Either way, only phone numbers/names already in the `Clients` sheet can be used — there's no free
-  text, so appointments can only be created for already-registered clients. This is also enforced server-side (the
+- **Client ↔ Appointment relationship**: on the appointment form there's one combined lookup field —
+  type either the client's mobile number *or* their name, and it auto-fills the moment it exactly
+  matches a registered client (typing a name resolves it to that client's real phone number
+  automatically), with a small suggestion list while you're still typing. The Client dropdown below
+  it works the same way in reverse. Either way, only clients already in the `Clients` sheet can be
+  used — there's no free text, so appointments can only be created for already-registered clients. This is also enforced server-side (the
   `/api/appointments` POST/PUT routes reject any client name that isn't found in `Clients`), so it
   can't be bypassed by calling the API directly either.
 

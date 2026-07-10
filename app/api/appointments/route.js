@@ -64,6 +64,7 @@ export async function POST(req) {
     'phone number': body.phoneNumber || '',
     'preferred date': body.preferredDate,
     'preferred time': body.preferredTime || '',
+    platform: body.platform || '',
     status: body.status || 'Pending',
     'created by': session.username,
   };

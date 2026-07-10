@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Modal from './Modal';
-import { APPOINTMENT_STATUSES } from '@/lib/constants';
+import { APPOINTMENT_STATUSES, PLATFORMS } from '@/lib/constants';
 
 export default function AppointmentFormModal({ initial, onClose, onSaved }) {
   const [clients, setClients] = useState([]);
@@ -13,6 +13,7 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
     phoneNumber: initial?.['phone number'] || '',
     preferredDate: toDateInputValue(initial?.['preferred date']),
     preferredTime: initial?.['preferred time'] || '',
+    platform: initial?.platform || PLATFORMS[0],
     status: initial?.status || APPOINTMENT_STATUSES[0],
   });
   const [saving, setSaving] = useState(false);
@@ -40,22 +41,27 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
   function handlePhoneChange(value) {
     setForm((f) => ({ ...f, phoneNumber: value }));
 
-    const digits = value.trim();
-    if (digits.length < 3) {
+    const query = value.trim();
+    if (query.length < 2) {
       setPhoneSuggestions([]);
       return;
     }
+    const lowerQuery = query.toLowerCase();
 
-    // Exact match — auto-fill the client name right away.
-    const exact = clients.find((c) => c.phone && c.phone.trim() === digits);
+    // Exact match on phone OR name — auto-fill right away (name entries resolve to the real phone number).
+    const exact = clients.find(
+      (c) => (c.phone && c.phone.trim() === query) || (c['client name'] && c['client name'].toLowerCase() === lowerQuery)
+    );
     if (exact) {
-      setForm((f) => ({ ...f, phoneNumber: value, clientName: exact['client name'] }));
+      setForm((f) => ({ ...f, phoneNumber: exact.phone || value, clientName: exact['client name'] }));
       setPhoneSuggestions([]);
       return;
     }
 
-    // Otherwise show partial matches to pick from.
-    const matches = clients.filter((c) => c.phone && c.phone.includes(digits)).slice(0, 5);
+    // Otherwise show partial matches on phone or name to pick from.
+    const matches = clients
+      .filter((c) => (c.phone && c.phone.includes(query)) || (c['client name'] && c['client name'].toLowerCase().includes(lowerQuery)))
+      .slice(0, 5);
     setPhoneSuggestions(matches);
   }
 
@@ -64,7 +70,11 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
     setPhoneSuggestions([]);
   }
 
-  const phoneMatchedClient = clients.find((c) => c.phone && c.phone.trim() === form.phoneNumber.trim());
+  const phoneMatchedClient = clients.find(
+    (c) =>
+      (c.phone && c.phone.trim() === form.phoneNumber.trim()) ||
+      (c['client name'] && c['client name'].toLowerCase() === form.phoneNumber.trim().toLowerCase())
+  );
 
   async function submit(e) {
     e.preventDefault();
@@ -88,12 +98,12 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
     <Modal title={initial ? 'Edit Appointment' : 'Add Appointment'} onClose={onClose} wide>
       <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
-          <label className="block text-xs font-medium text-slate-500 mb-1">Phone Number</label>
+          <label className="block text-xs font-medium text-slate-500 mb-1">Phone Number or Client Name</label>
           <input
             required
             value={form.phoneNumber}
             onChange={(e) => handlePhoneChange(e.target.value)}
-            placeholder="Type a registered client's mobile number"
+            placeholder="Type a registered client's mobile number or name"
             className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
           {phoneSuggestions.length > 0 && (
@@ -111,8 +121,8 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
               ))}
             </div>
           )}
-          {form.phoneNumber.trim().length >= 3 && !phoneMatchedClient && phoneSuggestions.length === 0 && (
-            <p className="text-xs text-amber-600 mt-1">No registered client matches this number.</p>
+          {form.phoneNumber.trim().length >= 2 && !phoneMatchedClient && phoneSuggestions.length === 0 && (
+            <p className="text-xs text-amber-600 mt-1">No registered client matches this number or name.</p>
           )}
           {phoneMatchedClient && <p className="text-xs text-emerald-600 mt-1">Matched: {phoneMatchedClient['client name']}</p>}
         </div>
@@ -153,6 +163,12 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
             onChange={(e) => set('preferredTime', e.target.value)}
             className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm"
           />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-slate-500 mb-1">Booked Via</label>
+          <select value={form.platform} onChange={(e) => set('platform', e.target.value)} className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm">
+            {PLATFORMS.map((p) => <option key={p}>{p}</option>)}
+          </select>
         </div>
         <div className="md:col-span-2">
           <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>

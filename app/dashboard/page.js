@@ -8,6 +8,7 @@ import AppointmentsTrendChart from '@/components/charts/AppointmentsTrendChart';
 import AppointmentStatusChart from '@/components/charts/AppointmentStatusChart';
 import ClientsGrowthChart from '@/components/charts/ClientsGrowthChart';
 import ClientsByPlatformChart from '@/components/charts/ClientsByPlatformChart';
+import AppointmentsByPlatformChart from '@/components/charts/AppointmentsByPlatformChart';
 
 export default function DashboardPage() {
   const { user } = useCurrentUser();
@@ -86,6 +87,7 @@ export default function DashboardPage() {
             <AppointmentStatusChart data={chartData.apptByStatus} />
             <ClientsGrowthChart data={chartData.clientsByMonth} />
             <ClientsByPlatformChart data={chartData.clientsByPlatform} />
+            <AppointmentsByPlatformChart data={chartData.apptByPlatform} />
           </>
         ) : (
           <div className="col-span-2 h-[240px] flex items-center justify-center text-sm text-slate-400 bg-white rounded-2xl border border-slate-100">

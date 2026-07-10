@@ -21,6 +21,7 @@ export async function PUT(req, { params }) {
   if (body.phoneNumber !== undefined) updated['phone number'] = body.phoneNumber;
   if (body.preferredDate !== undefined) updated['preferred date'] = body.preferredDate;
   if (body.preferredTime !== undefined) updated['preferred time'] = body.preferredTime;
+  if (body.platform !== undefined) updated.platform = body.platform;
   if (body.status !== undefined) updated.status = body.status;
 
   try {

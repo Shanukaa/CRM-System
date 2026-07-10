@@ -96,6 +96,16 @@ async function chartStats() {
     return { month: d.toLocaleDateString('en-US', { month: 'short' }), count };
   });
 
+  // Appointments grouped by how they were booked
+  const apptPlatformCounts = {};
+  appts.forEach((a) => {
+    const p = a.platform || 'Unspecified';
+    apptPlatformCounts[p] = (apptPlatformCounts[p] || 0) + 1;
+  });
+  const apptByPlatform = Object.entries(apptPlatformCounts)
+    .map(([platform, count]) => ({ platform, count }))
+    .sort((a, b) => b.count - a.count);
+
   // Clients grouped by how they registered
   const platformCounts = {};
   clients.forEach((c) => {
@@ -106,7 +116,7 @@ async function chartStats() {
     .map(([platform, count]) => ({ platform, count }))
     .sort((a, b) => b.count - a.count);
 
-  return { apptTrend, apptByStatus, clientsByMonth, clientsByPlatform };
+  return { apptTrend, apptByStatus, clientsByMonth, clientsByPlatform, apptByPlatform };
 }
 
 function toDateKey(d) {
