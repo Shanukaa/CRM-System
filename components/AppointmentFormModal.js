@@ -6,6 +6,7 @@ import { APPOINTMENT_STATUSES } from '@/lib/constants';
 export default function AppointmentFormModal({ initial, onClose, onSaved }) {
   const [clients, setClients] = useState([]);
   const [clientsLoading, setClientsLoading] = useState(true);
+  const [phoneSuggestions, setPhoneSuggestions] = useState([]);
   const [form, setForm] = useState({
     clientName: initial?.['client name'] || '',
     treatmentName: initial?.['treatment name'] || '',
@@ -33,7 +34,37 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
       clientName: name,
       phoneNumber: client ? client.phone || '' : '',
     }));
+    setPhoneSuggestions([]);
   }
+
+  function handlePhoneChange(value) {
+    setForm((f) => ({ ...f, phoneNumber: value }));
+
+    const digits = value.trim();
+    if (digits.length < 3) {
+      setPhoneSuggestions([]);
+      return;
+    }
+
+    // Exact match — auto-fill the client name right away.
+    const exact = clients.find((c) => c.phone && c.phone.trim() === digits);
+    if (exact) {
+      setForm((f) => ({ ...f, phoneNumber: value, clientName: exact['client name'] }));
+      setPhoneSuggestions([]);
+      return;
+    }
+
+    // Otherwise show partial matches to pick from.
+    const matches = clients.filter((c) => c.phone && c.phone.includes(digits)).slice(0, 5);
+    setPhoneSuggestions(matches);
+  }
+
+  function pickSuggestion(client) {
+    setForm((f) => ({ ...f, clientName: client['client name'], phoneNumber: client.phone }));
+    setPhoneSuggestions([]);
+  }
+
+  const phoneMatchedClient = clients.find((c) => c.phone && c.phone.trim() === form.phoneNumber.trim());
 
   async function submit(e) {
     e.preventDefault();
@@ -56,6 +87,35 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
   return (
     <Modal title={initial ? 'Edit Appointment' : 'Add Appointment'} onClose={onClose} wide>
       <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="relative">
+          <label className="block text-xs font-medium text-slate-500 mb-1">Phone Number</label>
+          <input
+            required
+            value={form.phoneNumber}
+            onChange={(e) => handlePhoneChange(e.target.value)}
+            placeholder="Type a registered client's mobile number"
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
+          />
+          {phoneSuggestions.length > 0 && (
+            <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-card overflow-hidden">
+              {phoneSuggestions.map((c) => (
+                <button
+                  type="button"
+                  key={c.ID}
+                  onClick={() => pickSuggestion(c)}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 flex items-center justify-between"
+                >
+                  <span className="text-slate-700">{c['client name']}</span>
+                  <span className="text-slate-400 text-xs">{c.phone}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {form.phoneNumber.trim().length >= 3 && !phoneMatchedClient && phoneSuggestions.length === 0 && (
+            <p className="text-xs text-amber-600 mt-1">No registered client matches this number.</p>
+          )}
+          {phoneMatchedClient && <p className="text-xs text-emerald-600 mt-1">Matched: {phoneMatchedClient['client name']}</p>}
+        </div>
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">Client</label>
           <select
@@ -65,7 +125,7 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
             disabled={clientsLoading}
             className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm disabled:bg-slate-50"
           >
-            <option value="">{clientsLoading ? 'Loading clients...' : 'Select a registered client'}</option>
+            <option value="">{clientsLoading ? 'Loading clients...' : 'Or select a registered client'}</option>
             {clients.map((c) => (
               <option key={c.ID} value={c['client name']}>{c['client name']}</option>
             ))}
@@ -75,15 +135,6 @@ export default function AppointmentFormModal({ initial, onClose, onSaved }) {
           )}
         </div>
         <Field label="Treatment Name" value={form.treatmentName} onChange={(v) => set('treatmentName', v)} />
-        <div>
-          <label className="block text-xs font-medium text-slate-500 mb-1">Phone Number</label>
-          <input
-            value={form.phoneNumber}
-            readOnly
-            placeholder="Auto-filled from client"
-            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 text-slate-500"
-          />
-        </div>
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">Preferred Date</label>
           <input

@@ -149,10 +149,11 @@ added to the `Users` sheet.
   bookings and bulk imports) — you never need to manually reactivate someone who's just booked.
   Manually setting a client to `Inactive` yourself is respected and left alone by the automatic
   check; it only ever demotes clients that are currently `Active`, never promotes anyone.
-- **Client ↔ Appointment relationship**: the "Client" field on the appointment form is a dropdown
-  populated only from the `Clients` sheet — you can't type a free-text name, so appointments can
-  only be created for already-registered clients. The phone number field is read-only and
-  auto-fills from the selected client's `phone` value. This is also enforced server-side (the
+- **Client ↔ Appointment relationship**: on the appointment form you can find a client either way —
+  type their mobile number and the client name auto-fills once it matches (with a small suggestion
+  list while you type), or pick them by name from the dropdown, which fills the phone number in turn.
+  Either way, only phone numbers/names already in the `Clients` sheet can be used — there's no free
+  text, so appointments can only be created for already-registered clients. This is also enforced server-side (the
   `/api/appointments` POST/PUT routes reject any client name that isn't found in `Clients`), so it
   can't be bypassed by calling the API directly either.
 
