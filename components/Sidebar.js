@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, CalendarCheck, LogOut, UserCog, Menu, X, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, CalendarCheck, LogOut, UserCog, Menu, X, Stethoscope } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Sidebar({ user }) {
@@ -41,7 +41,7 @@ export default function Sidebar({ user }) {
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-2.5">
             <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-700 shadow-lift">
-              <Sparkles size={17} className="text-white" />
+              <Stethoscope size={18} className="text-white" />
             </span>
             <h1 className="text-base font-semibold text-white tracking-tight">Clinic Manager</h1>
           </div>
