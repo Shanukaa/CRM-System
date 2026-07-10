@@ -1,24 +1,12 @@
 'use client';
 import { useState } from 'react';
 import Modal from './Modal';
-import { GENDERS, PLATFORMS, CLIENT_STATUSES, COUNTRY_CODES } from '@/lib/constants';
-
-function splitPhone(phone) {
-  if (!phone) return { countryCode: COUNTRY_CODES[0].code, localNumber: '' };
-  const trimmed = phone.trim();
-  const match = COUNTRY_CODES.slice().sort((a, b) => b.code.length - a.code.length).find((c) => trimmed.startsWith(c.code));
-  if (match) {
-    return { countryCode: match.code, localNumber: trimmed.slice(match.code.length).replace(/\D/g, '') };
-  }
-  return { countryCode: COUNTRY_CODES[0].code, localNumber: trimmed.replace(/\D/g, '') };
-}
+import { GENDERS, PLATFORMS, CLIENT_STATUSES } from '@/lib/constants';
 
 export default function ClientFormModal({ initial, onClose, onSaved }) {
-  const initialPhone = splitPhone(initial?.phone);
   const [form, setForm] = useState({
     clientName: initial?.['client name'] || '',
-    countryCode: initialPhone.countryCode,
-    localNumber: initialPhone.localNumber,
+    phone: initial?.phone ? initial.phone.replace(/\D/g, '') : '',
     gender: initial?.gender || GENDERS[0],
     language: initial?.language || '',
     platform: initial?.platform || PLATFORMS[0],
@@ -29,8 +17,8 @@ export default function ClientFormModal({ initial, onClose, onSaved }) {
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  function setLocalNumber(v) {
-    set('localNumber', v.replace(/\D/g, '').slice(0, 12));
+  function setPhone(v) {
+    set('phone', v.replace(/\D/g, '').slice(0, 15));
   }
 
   async function submit(e) {
@@ -38,17 +26,9 @@ export default function ClientFormModal({ initial, onClose, onSaved }) {
     setSaving(true);
     setError('');
     try {
-      const payload = {
-        clientName: form.clientName,
-        phone: `${form.countryCode} ${form.localNumber}`.trim(),
-        gender: form.gender,
-        language: form.language,
-        platform: form.platform,
-        status: form.status,
-      };
       const url = initial ? `/api/clients/${initial.ID}` : '/api/clients';
       const method = initial ? 'PUT' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save');
       onSaved();
@@ -65,27 +45,16 @@ export default function ClientFormModal({ initial, onClose, onSaved }) {
         <Field label="Client Name" value={form.clientName} onChange={(v) => set('clientName', v)} required />
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">Phone</label>
-          <div className="flex gap-2">
-            <select
-              value={form.countryCode}
-              onChange={(e) => set('countryCode', e.target.value)}
-              className="border border-slate-200 rounded-xl px-2 py-2 text-sm w-28 shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-200"
-            >
-              {COUNTRY_CODES.map((c) => (
-                <option key={c.code} value={c.code}>{c.code} {c.country}</option>
-              ))}
-            </select>
-            <input
-              required
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="771234567"
-              value={form.localNumber}
-              onChange={(e) => setLocalNumber(e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
-            />
-          </div>
+          <input
+            required
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="0771234567"
+            value={form.phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
+          />
           <p className="text-xs text-slate-400 mt-1">Numbers only — no spaces, dashes, or symbols.</p>
         </div>
         <div>
