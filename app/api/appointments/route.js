@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSheetRows, appendRow } from '@/lib/googleSheets';
+import { getSheetRows, appendRow, updateRowById } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -51,7 +51,8 @@ export async function POST(req) {
   }
 
   const { rows: clients } = await getSheetRows('Clients');
-  if (!clients.some((c) => c['client name'] === body.clientName)) {
+  const client = clients.find((c) => c['client name'] === body.clientName);
+  if (!client) {
     return NextResponse.json({ error: 'Appointments can only be made for registered clients' }, { status: 400 });
   }
 
@@ -67,6 +68,12 @@ export async function POST(req) {
     'created by': session.username,
   };
   await appendRow('Appointments', record);
+
+  // Booking an appointment means the client is engaged again — reactivate them if needed.
+  if ((client.status || '').toLowerCase() !== 'active') {
+    await updateRowById('Clients', client.ID, { status: 'Active' });
+  }
+
   return NextResponse.json({ success: true, data: record });
 }
 

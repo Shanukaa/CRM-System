@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSheetRows, appendRows } from '@/lib/googleSheets';
+import { getSheetRows, appendRows, batchUpdateColumn } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,13 +18,15 @@ export async function POST(req) {
   }
 
   const { rows: clients } = await getSheetRows('Clients');
-  const phoneByClient = new Map(clients.map((c) => [c['client name'], c.phone]));
+  const clientByName = new Map(clients.map((c) => [c['client name'], c]));
 
   const valid = [];
+  const toReactivate = new Map();
   let skipped = 0;
 
   rows.forEach((r, i) => {
-    if (!r.clientName || !r.preferredDate || !phoneByClient.has(r.clientName)) {
+    const client = clientByName.get(r.clientName);
+    if (!r.clientName || !r.preferredDate || !client) {
       skipped++;
       return;
     }
@@ -33,15 +35,19 @@ export async function POST(req) {
       'appointment number': `APT-${Date.now().toString().slice(-6)}-${i}`,
       'client name': r.clientName,
       'treatment name': r.treatmentName || '',
-      'phone number': phoneByClient.get(r.clientName) || '',
+      'phone number': client.phone || '',
       'preferred date': r.preferredDate,
       'preferred time': r.preferredTime || '',
       status: r.status || 'Pending',
       'created by': session.username,
     });
+    if ((client.status || '').toLowerCase() !== 'active') {
+      toReactivate.set(client.ID, 'Active');
+    }
   });
 
   if (valid.length) await appendRows('Appointments', valid);
+  if (toReactivate.size) await batchUpdateColumn('Clients', 'status', toReactivate);
 
   return NextResponse.json({ success: true, imported: valid.length, skipped });
 }

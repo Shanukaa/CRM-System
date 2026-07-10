@@ -130,6 +130,18 @@ added to the `Users` sheet.
   create, manual edit, and CSV/Excel import alike — duplicates are rejected (a 409 error on the
   form, or counted into "skipped" on import, including duplicates *within* the uploaded file
   itself, not just against what's already in the sheet).
+- **Automatic client inactivity**: a client is automatically marked `Inactive` if they haven't had
+  an appointment (by preferred date) in the last 2 months — or, for a client who's never booked at
+  all, if it's been 2+ months since they were registered. This runs two ways:
+  1. **Daily automatically** via a Netlify Scheduled Function (`netlify/functions/deactivate-stale-clients.mjs`,
+     runs at 02:00 UTC). This only works once deployed to Netlify — it does nothing in local `npm run dev`.
+  2. **On demand** via a "Run inactivity check now" button on the Dashboard page, visible to admins
+     only — useful as a backup if scheduled functions aren't enabled on your Netlify plan, or if you
+     just want to check right now.
+  Booking a new appointment for a client instantly flips them back to `Active` (both for single
+  bookings and bulk imports) — you never need to manually reactivate someone who's just booked.
+  Manually setting a client to `Inactive` yourself is respected and left alone by the automatic
+  check; it only ever demotes clients that are currently `Active`, never promotes anyone.
 - **Client ↔ Appointment relationship**: the "Client" field on the appointment form is a dropdown
   populated only from the `Clients` sheet — you can't type a free-text name, so appointments can
   only be created for already-registered clients. The phone number field is read-only and
