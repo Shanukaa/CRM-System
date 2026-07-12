@@ -48,6 +48,36 @@ row the app creates will get a proper unique ID automatically.)
 
 ---
 
+## 1b. (Optional) Set up the separate Leads Google Sheet
+
+The "Lead Form" section (FAT Contouring / Body Fillers) reads from its **own, separate** Google
+Sheet file — not the one above. If you already have this sheet, it just needs two tabs with these
+exact headers:
+
+### Tab: `FAT Contouring`
+Typically populated by a Facebook/Meta Lead Ads export or automation — the app only reads it, it
+never writes to it. Row 1 headers, exact spelling/case:
+```
+created_time | ad_id | ad_name | adset_id | adset_name | campaign_id | campaign_name | form_id | form_name | is_organic | platform | Are_you_18_years_of_age_or_older? | which_area_would_you_like_to_discuss_for_body_contouring? | what_would_you_mainly_like_to_learn_more_about? | full_name | phone_number | city | lead_status | 1st Status | 2nd Status | are_you_18_years_of_age_or_older?
+```
+Note there are two near-identical headers differing only by the first letter's case
+(`Are_you_18...` and `are_you_18...`) — both are kept as separate columns, labeled "18+? (A)" and
+"18+? (B)" in the app, matching the source data exactly.
+
+### Tab: `Body Fillers`
+```
+id | created_time | ad_id | ad_name | adset_id | adset_name | campaign_id | campaign_name | form_id | form_name | is_organic | platform | are_you_18_years_of_age_or_older? | which_filler_treatment_are_you_interested_in? | what_is_the_best_time_to_contact_you? | full_name | phone_number | city | lead_status | Call 01 | Call 02 | Call 03 | Note | Treatment | Staff
+```
+
+**This sheet needs to be shared with the same service account** you set up in step 2 below (its
+`client_email`) — Viewer access is enough, since the app only reads this sheet. Then grab its
+Sheet ID from its URL the same way as in step 1, and set it as `GOOGLE_LEADS_SHEET_ID` in step 3.
+
+If you don't need the Lead Form feature, skip this — just leave `GOOGLE_LEADS_SHEET_ID` unset and
+that section of the app will show a clear error instead of breaking anything else.
+
+---
+
 ## 2. Create a Google Cloud service account (so the app can read/write the sheet)
 
 1. Go to https://console.cloud.google.com/ and create a project (or use an existing one).
@@ -61,7 +91,8 @@ row the app creates will get a proper unique ID automatically.)
    - `private_key` → this is your `GOOGLE_PRIVATE_KEY`
 6. Open your Google Sheet, click **Share**, and share it with the `client_email` address
    (the one ending in `...iam.gserviceaccount.com`) as an **Editor**. Without this step the app
-   cannot read or write the sheet.
+   cannot read or write the sheet. **If you're using the separate Leads sheet from step 1b,
+   share that one with the same `client_email` too** (Viewer access is enough for it).
 7. Get your Sheet ID from its URL:
    `https://docs.google.com/spreadsheets/d/THIS_PART_IS_THE_ID/edit`
 
@@ -75,10 +106,12 @@ Copy `.env.example` to `.env.local` for local development and fill in:
 GOOGLE_SERVICE_ACCOUNT_EMAIL=...
 GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 GOOGLE_SHEET_ID=...
+GOOGLE_LEADS_SHEET_ID=...
 SESSION_SECRET=any-long-random-string
 ```
 
-`GOOGLE_PRIVATE_KEY` must keep its `\n` sequences and be wrapped in quotes.
+`GOOGLE_PRIVATE_KEY` must keep its `\n` sequences and be wrapped in quotes. `GOOGLE_LEADS_SHEET_ID`
+is only needed if you're using the Lead Form section (step 1b) — otherwise leave it out entirely.
 
 ---
 
@@ -108,6 +141,15 @@ added to the `Users` sheet.
 
 ## How it's structured
 
+- **Lead Form**: an expandable nav section with two sub-pages, "FAT Contouring" and "Body
+  Fillers", reading from a **separate Google Sheet file** (its own `GOOGLE_LEADS_SHEET_ID`, see
+  setup section 1b) rather than the main one used everywhere else — `lib/googleSheets.js` accepts
+  an optional `spreadsheetId` on every function for exactly this reason. These pages are
+  **read-only** — search, column visibility settings, and export all work the same as Clients/
+  Appointments, but there's no create/update/delete since this data is meant to arrive from an
+  external source (e.g. a Facebook Lead Ads export or automation), not be entered manually here.
+  Both admins and employees can view it. A single dynamic API route (`/api/leads/[table]`) serves
+  both tables to avoid duplicating the same logic twice.
 - **Auth**: username/password checked against the `Users` sheet; a signed JWT is set as an
   HTTP-only cookie (12h expiry). Middleware (`middleware.js`) protects all `/dashboard/*` routes
   and blocks non-admins from `/dashboard/users`.
@@ -115,11 +157,6 @@ added to the `Users` sheet.
   per-row requests), with a few seconds of in-memory caching to reduce duplicate reads. Writes
   invalidate the cache immediately.
 - **Pagination**: 15 rows per page for Clients and Appointments, computed server-side.
-- **Sorting**: both tables have a sort dropdown next to search. Clients: sort by registration
-  date & time (Newest first / Oldest first). Appointments: sort by "Recently added" (default) or
-  by the actual scheduled date & time (Soonest first / Latest first) — useful since when an
-  appointment was booked and when it's actually scheduled for are two different things. Sorting
-  applies before pagination and carries through to Export.
 - **Search**: Clients has a single global search box; Appointments has global search + date
   filter + status filter, all combinable.
 - **Table settings**: column visibility is saved per-browser in `localStorage`, with a reset

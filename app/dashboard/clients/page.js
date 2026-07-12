@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Download, Users, UserCheck, UserX, Phone } from 'lucide-react';
+import { RefreshCw, Plus, Download, Users, UserCheck, UserX, Phone, ArrowUpDown } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
@@ -22,7 +22,6 @@ export default function ClientsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [q, setQ] = useState('');
-  const [sort, setSort] = useState('newest');
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(DEFAULT_VISIBLE);
   const [formOpen, setFormOpen] = useState(false);
@@ -54,7 +53,7 @@ export default function ClientsPage() {
 
   async function loadRows() {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(page), q, sort });
+    const params = new URLSearchParams({ page: String(page), q });
     const res = await fetch(`/api/clients?${params}`);
     if (res.ok) {
       const data = await res.json();
@@ -65,8 +64,8 @@ export default function ClientsPage() {
   }
 
   useEffect(() => { loadStats(); }, []);
-  useEffect(() => { setPage(1); }, [q, sort]);
-  useEffect(() => { loadRows(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [page, q, sort]);
+  useEffect(() => { setPage(1); }, [q]);
+  useEffect(() => { loadRows(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [page, q]);
 
   async function handleDelete() {
     if (!deleting) return;
@@ -77,7 +76,7 @@ export default function ClientsPage() {
   }
 
   async function handleExport() {
-    const res = await fetch(`/api/clients?all=true&sort=${sort}`);
+    const res = await fetch('/api/clients?all=true');
     const data = await res.json();
     exportToExcel(data.data, CLIENT_COLUMNS, 'clients');
   }
@@ -101,15 +100,6 @@ export default function ClientsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 border-b border-slate-100">
           <SearchBar value={q} onChange={setQ} placeholder="Search clients..." />
           <div className="flex items-center gap-2 flex-wrap">
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-200"
-              title="Sort by registration date & time"
-            >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-            </select>
             <button onClick={() => { loadRows(); loadStats(); }} className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50" title="Refresh">
               <RefreshCw size={16} />
             </button>

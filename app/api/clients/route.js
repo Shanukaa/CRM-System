@@ -12,7 +12,7 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get('page') || '1', 10);
   const q = (searchParams.get('q') || '').toLowerCase().trim();
-  const sort = searchParams.get('sort') || 'newest';
+  const sortDir = searchParams.get('sort') === 'asc' ? 'asc' : 'desc';
   const all = searchParams.get('all') === 'true';
 
   const { rows } = await getSheetRows('Clients');
@@ -20,26 +20,14 @@ export async function GET(req) {
   if (q) {
     filtered = filtered.filter((r) => Object.values(r).some((v) => String(v).toLowerCase().includes(q)));
   }
-
-  if (sort === 'oldest') {
-    filtered = filtered.slice().sort((a, b) => {
-      const da = parseDate(a['created at']);
-      const db = parseDate(b['created at']);
-      if (!da && !db) return 0;
-      if (!da) return 1;
-      if (!db) return -1;
-      return da - db;
-    });
-  } else {
-    filtered = filtered.slice().sort((a, b) => {
-      const da = parseDate(a['created at']);
-      const db = parseDate(b['created at']);
-      if (!da && !db) return 0;
-      if (!da) return 1;
-      if (!db) return -1;
-      return db - da; // newest first (default)
-    });
-  }
+  filtered = filtered.slice().sort((a, b) => {
+    const da = parseDate(a['created at']);
+    const db = parseDate(b['created at']);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return sortDir === 'asc' ? da - db : db - da;
+  });
 
   const total = filtered.length;
   const pageRows = all ? filtered : filtered.slice((page - 1) * PAGE_SIZE, (page - 1) * PAGE_SIZE + PAGE_SIZE);

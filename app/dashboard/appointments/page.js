@@ -31,7 +31,6 @@ export default function AppointmentsPage() {
   const [q, setQ] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sort, setSort] = useState('recent');
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(DEFAULT_VISIBLE);
   const [formOpen, setFormOpen] = useState(false);
@@ -61,7 +60,7 @@ export default function AppointmentsPage() {
 
   async function loadRows() {
     setLoading(true);
-    const params = new URLSearchParams({ page: String(page), q, date: dateFilter, status: statusFilter, sort });
+    const params = new URLSearchParams({ page: String(page), q, date: dateFilter, status: statusFilter });
     const res = await fetch(`/api/appointments?${params}`);
     if (res.ok) {
       const data = await res.json();
@@ -72,8 +71,8 @@ export default function AppointmentsPage() {
   }
 
   useEffect(() => { loadStats(); }, []);
-  useEffect(() => { setPage(1); }, [q, dateFilter, statusFilter, sort]);
-  useEffect(() => { loadRows(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [page, q, dateFilter, statusFilter, sort]);
+  useEffect(() => { setPage(1); }, [q, dateFilter, statusFilter]);
+  useEffect(() => { loadRows(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [page, q, dateFilter, statusFilter]);
 
   async function handleDelete() {
     if (!deleting) return;
@@ -84,7 +83,7 @@ export default function AppointmentsPage() {
   }
 
   async function handleExport() {
-    const params = new URLSearchParams({ all: 'true', q, date: dateFilter, status: statusFilter, sort });
+    const params = new URLSearchParams({ all: 'true', q, date: dateFilter, status: statusFilter });
     const res = await fetch(`/api/appointments?${params}`);
     const data = await res.json();
     exportToExcel(data.data, APPOINTMENT_COLUMNS, 'appointments');
@@ -121,16 +120,6 @@ export default function AppointmentsPage() {
             >
               <option value="">All statuses</option>
               {APPOINTMENT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="px-3 py-2 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-200"
-              title="Sort by preferred date & time"
-            >
-              <option value="recent">Recently added</option>
-              <option value="soonest">Date & Time: Soonest first</option>
-              <option value="latest">Date & Time: Latest first</option>
             </select>
           </div>
           <div className="flex items-center gap-2 flex-wrap">

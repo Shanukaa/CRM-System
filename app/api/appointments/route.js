@@ -14,7 +14,7 @@ export async function GET(req) {
   const q = (searchParams.get('q') || '').toLowerCase().trim();
   const dateFilter = searchParams.get('date') || '';
   const statusFilter = searchParams.get('status') || '';
-  const sort = searchParams.get('sort') || 'recent';
+  const sortDir = searchParams.get('sort') === 'asc' ? 'asc' : 'desc';
   const all = searchParams.get('all') === 'true';
 
   const { rows } = await getSheetRows('Appointments');
@@ -28,19 +28,14 @@ export async function GET(req) {
   if (dateFilter) {
     filtered = filtered.filter((r) => normalizeDate(r['preferred date']) === dateFilter);
   }
-
-  if (sort === 'soonest' || sort === 'latest') {
-    filtered = filtered.slice().sort((a, b) => {
-      const da = apptDateTime(a);
-      const db = apptDateTime(b);
-      if (!da && !db) return 0;
-      if (!da) return 1;
-      if (!db) return -1;
-      return sort === 'soonest' ? da - db : db - da;
-    });
-  } else {
-    filtered = filtered.slice().reverse(); // 'recent' (default) — most recently added first
-  }
+  filtered = filtered.slice().sort((a, b) => {
+    const da = apptDateTime(a);
+    const db = apptDateTime(b);
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return sortDir === 'asc' ? da - db : db - da;
+  });
 
   const total = filtered.length;
   const pageRows = all ? filtered : filtered.slice((page - 1) * PAGE_SIZE, (page - 1) * PAGE_SIZE + PAGE_SIZE);
@@ -97,15 +92,15 @@ function normalizeDate(v) {
   return isNaN(d) ? v : d.toISOString().slice(0, 10);
 }
 
+function cleanRow(r) {
+  const { _rowNumber, ...rest } = r;
+  return rest;
+}
+
 function apptDateTime(a) {
   const date = normalizeDate(a['preferred date']);
   if (!date) return null;
   const time = a['preferred time'] || '00:00';
   const d = new Date(`${date}T${time}`);
   return isNaN(d) ? null : d;
-}
-
-function cleanRow(r) {
-  const { _rowNumber, ...rest } = r;
-  return rest;
 }
