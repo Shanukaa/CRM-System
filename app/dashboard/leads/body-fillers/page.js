@@ -1,8 +1,6 @@
 'use client';
 import LeadsTable from '@/components/LeadsTable';
-import { BODY_FILLERS_COLUMNS } from '@/lib/constants';
-
-const DEFAULT_VISIBLE = BODY_FILLERS_COLUMNS.map((c) => c.key);
+import { BODY_FILLERS_COLUMNS, BODY_FILLERS_DEFAULT_VISIBLE, BODY_FILLERS_EDITABLE } from '@/lib/constants';
 
 export default function BodyFillersLeadsPage() {
   return (
@@ -12,7 +10,8 @@ export default function BodyFillersLeadsPage() {
       tableSlug="body-fillers"
       columns={BODY_FILLERS_COLUMNS}
       storageKey="leadsBodyFillersColumns"
-      defaultVisible={DEFAULT_VISIBLE}
+      defaultVisible={BODY_FILLERS_DEFAULT_VISIBLE}
+      editableColumns={BODY_FILLERS_EDITABLE}
     />
   );
 }

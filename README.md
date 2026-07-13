@@ -144,12 +144,26 @@ added to the `Users` sheet.
 - **Lead Form**: an expandable nav section with two sub-pages, "FAT Contouring" and "Body
   Fillers", reading from a **separate Google Sheet file** (its own `GOOGLE_LEADS_SHEET_ID`, see
   setup section 1b) rather than the main one used everywhere else — `lib/googleSheets.js` accepts
-  an optional `spreadsheetId` on every function for exactly this reason. These pages are
-  **read-only** — search, column visibility settings, and export all work the same as Clients/
-  Appointments, but there's no create/update/delete since this data is meant to arrive from an
-  external source (e.g. a Facebook Lead Ads export or automation), not be entered manually here.
-  Both admins and employees can view it. A single dynamic API route (`/api/leads/[table]`) serves
-  both tables to avoid duplicating the same logic twice.
+  an optional `spreadsheetId` on every function for exactly this reason. Both admins and employees
+  can view it. A single dynamic API route (`/api/leads/[table]`) serves both tables.
+  - **Defaults**: FAT Contouring defaults to showing Full Name, Phone Number, City, Area of
+    Interest, and Wants to Learn About; Body Fillers defaults to Full Name, Phone Number, City,
+    Filler Treatment Interest, and Platform. Every other column (ad/campaign metadata, etc.) is
+    still there — just hidden until turned on via the Table Settings column picker, same as
+    Clients/Appointments.
+  - **Editable follow-up columns**: on FAT Contouring, "1st Status" and "2nd Status" are editable
+    inline (click the cell, type, click away to save). On Body Fillers, "Note", "Staff", "Call
+    01", "Call 02", and "Call 03" are editable the same way. Every other column is read-only,
+    since the rest of the data is meant to arrive from an external source (e.g. a Facebook Lead
+    Ads export or automation) and shouldn't be hand-edited. The editable set is enforced
+    server-side too — the PATCH endpoint rejects any other field even if called directly.
+  - **Date search**: type a date into the date field (or click "Today") to see just that day's
+    leads — the app resolves this against the sheet's `created_time` column so no manual date
+    parsing is expected in the sheet. Once a date is selected, results switch to **ascending
+    order** (oldest to newest within that day) instead of the usual most-recent-first; clear the
+    date to go back to normal.
+  - **Today's Leads**: a dedicated stat card next to Total Leads always reflects today's count,
+    independent of whatever date filter you currently have applied to the table below it.
 - **Auth**: username/password checked against the `Users` sheet; a signed JWT is set as an
   HTTP-only cookie (12h expiry). Middleware (`middleware.js`) protects all `/dashboard/*` routes
   and blocks non-admins from `/dashboard/users`.

@@ -1,8 +1,6 @@
 'use client';
 import LeadsTable from '@/components/LeadsTable';
-import { FAT_CONTOURING_COLUMNS } from '@/lib/constants';
-
-const DEFAULT_VISIBLE = FAT_CONTOURING_COLUMNS.map((c) => c.key);
+import { FAT_CONTOURING_COLUMNS, FAT_CONTOURING_DEFAULT_VISIBLE, FAT_CONTOURING_EDITABLE } from '@/lib/constants';
 
 export default function FatContouringLeadsPage() {
   return (
@@ -12,7 +10,8 @@ export default function FatContouringLeadsPage() {
       tableSlug="fat-contouring"
       columns={FAT_CONTOURING_COLUMNS}
       storageKey="leadsFatContouringColumns"
-      defaultVisible={DEFAULT_VISIBLE}
+      defaultVisible={FAT_CONTOURING_DEFAULT_VISIBLE}
+      editableColumns={FAT_CONTOURING_EDITABLE}
     />
   );
 }
