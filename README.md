@@ -151,12 +151,13 @@ added to the `Users` sheet.
     Filler Treatment Interest, and Platform. Every other column (ad/campaign metadata, etc.) is
     still there — just hidden until turned on via the Table Settings column picker, same as
     Clients/Appointments.
-  - **Editable follow-up columns**: on FAT Contouring, "1st Status" and "2nd Status" are editable
-    inline (click the cell, type, click away to save). On Body Fillers, "Note", "Staff", "Call
-    01", "Call 02", and "Call 03" are editable the same way. Every other column is read-only,
-    since the rest of the data is meant to arrive from an external source (e.g. a Facebook Lead
-    Ads export or automation) and shouldn't be hand-edited. The editable set is enforced
-    server-side too — the PATCH endpoint rejects any other field even if called directly.
+  - **Editable follow-up columns**: on FAT Contouring, "1st Status" and "2nd Status" are
+    editable; on Body Fillers, "Note", "Staff", "Call 01", "Call 02", and "Call 03" are editable.
+    Both tables have an **Actions** column with an **Edit** button that opens a small form for
+    just those fields — everything else in the row stays read-only, since that data is meant to
+    arrive from an external source (e.g. a Facebook Lead Ads export or automation) and shouldn't
+    be hand-edited. The editable set is enforced server-side too — the PATCH endpoint rejects any
+    other field even if called directly.
   - **Date search**: type a date into the date field (or click "Today") to see just that day's
     leads — the app resolves this against the sheet's `created_time` column so no manual date
     parsing is expected in the sheet. Once a date is selected, results switch to **ascending

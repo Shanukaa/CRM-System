@@ -5,6 +5,7 @@ import SearchBar from './SearchBar';
 import Pagination from './Pagination';
 import TableSettingsMenu from './TableSettingsMenu';
 import StatCard from './StatCard';
+import LeadEditModal from './LeadEditModal';
 import { exportToExcel } from '@/lib/exportClient';
 
 function todayStr() {
@@ -21,6 +22,9 @@ export default function LeadsTable({ title, subtitle, tableSlug, columns, storag
   const [dateFilter, setDateFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(defaultVisible);
+  const [editing, setEditing] = useState(null);
+
+  const editableFields = columns.filter((c) => editableColumns.includes(c.key));
 
   useEffect(() => {
     const saved = localStorage.getItem(storageKey);
@@ -77,21 +81,6 @@ export default function LeadsTable({ title, subtitle, tableSlug, columns, storag
     exportToExcel(data.data, columns, tableSlug);
   }
 
-  async function saveCell(row, field, value) {
-    setRows((prev) => prev.map((r) => (r._row === row._row ? { ...r, [field]: value } : r)));
-    try {
-      const res = await fetch(`/api/leads/${tableSlug}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ row: row._row, field, value }),
-      });
-      if (!res.ok) throw new Error('Failed to save');
-    } catch {
-      // Revert on failure and let the person know via a quick reload.
-      loadRows();
-    }
-  }
-
   const visibleCols = columns.filter((c) => visible.includes(c.key));
 
   return (
@@ -144,30 +133,27 @@ export default function LeadsTable({ title, subtitle, tableSlug, columns, storag
             <thead>
               <tr className="text-left text-slate-500 bg-slate-50 border-b border-slate-100">
                 {visibleCols.map((c) => (
-                  <th key={c.key} className="px-4 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">
-                    {c.label}
-                    {editableColumns.includes(c.key) && <span className="ml-1 text-brand-400 normal-case font-normal">(editable)</span>}
-                  </th>
+                  <th key={c.key} className="px-4 py-3 font-semibold text-xs uppercase tracking-wide whitespace-nowrap">{c.label}</th>
                 ))}
+                {editableFields.length > 0 && <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">Actions</th>}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={visibleCols.length || 1} className="text-center py-8 text-slate-400">Loading...</td></tr>
+                <tr><td colSpan={visibleCols.length + 1 || 1} className="text-center py-8 text-slate-400">Loading...</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={visibleCols.length || 1} className="text-center py-8 text-slate-400">No leads found</td></tr>
+                <tr><td colSpan={visibleCols.length + 1 || 1} className="text-center py-8 text-slate-400">No leads found</td></tr>
               ) : (
                 rows.map((row) => (
                   <tr key={row._row} className="border-b border-slate-50 hover:bg-slate-50">
                     {visibleCols.map((c) => (
-                      <td key={c.key} className="px-4 py-3 whitespace-nowrap">
-                        {editableColumns.includes(c.key) ? (
-                          <EditableCell value={row[c.key]} onSave={(v) => saveCell(row, c.key, v)} />
-                        ) : (
-                          row[c.key]
-                        )}
-                      </td>
+                      <td key={c.key} className="px-4 py-3 whitespace-nowrap">{row[c.key]}</td>
                     ))}
+                    {editableFields.length > 0 && (
+                      <td className="px-4 py-3">
+                        <button onClick={() => setEditing(row)} className="text-brand-600 text-xs font-medium hover:underline">Edit</button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -179,30 +165,16 @@ export default function LeadsTable({ title, subtitle, tableSlug, columns, storag
           <Pagination page={page} totalPages={totalPages} onChange={setPage} />
         </div>
       </div>
+
+      {editing && (
+        <LeadEditModal
+          row={editing}
+          fields={editableFields}
+          tableSlug={tableSlug}
+          onClose={() => setEditing(null)}
+          onSaved={() => { setEditing(null); loadRows(); }}
+        />
+      )}
     </div>
-  );
-}
-
-function EditableCell({ value, onSave }) {
-  const [val, setVal] = useState(value || '');
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => setVal(value || ''), [value]);
-
-  async function commit() {
-    if (val === (value || '')) return;
-    setSaving(true);
-    await onSave(val);
-    setSaving(false);
-  }
-
-  return (
-    <input
-      value={val}
-      disabled={saving}
-      onChange={(e) => setVal(e.target.value)}
-      onBlur={commit}
-      className="min-w-[120px] w-full bg-transparent border border-transparent hover:border-slate-200 focus:border-brand-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-brand-200 disabled:opacity-50"
-    />
   );
 }
