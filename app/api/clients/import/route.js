@@ -20,7 +20,7 @@ export async function POST(req) {
   const { rows: existing } = await getSheetRows('Clients', { useCache: false });
   const seenPhones = new Set(existing.map((r) => String(r.phone).trim()).filter(Boolean));
 
-  const now = new Date().toLocaleString('en-GB');
+  const now = new Date().toISOString();
   const valid = [];
   let skipped = 0;
 

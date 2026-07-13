@@ -4,6 +4,7 @@ import { RefreshCw, Plus, Eye, EyeOff, UserCog, CalendarCheck2, Pencil, Trash2, 
 import StatCard from '@/components/StatCard';
 import UserFormModal from '@/components/UserFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { formatDateTime } from '@/lib/format';
 
 const ONLINE_WINDOW_MS = 5 * 60 * 1000; // consider "online" if active within the last 5 minutes
 
@@ -147,7 +148,7 @@ export default function UsersPage() {
                           {online ? 'Online' : 'Offline'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-slate-500">{u['last login'] || 'Never'}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-slate-500">{formatDateTime(u['last login']) || 'Never'}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <button onClick={() => { setEditing(u); setFormOpen(true); }} title="Edit" className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50">

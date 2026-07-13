@@ -159,6 +159,13 @@ added to the `Users` sheet.
   at sign-in. This is a best-effort presence indicator, not a guaranteed real-time system — closing
   the tab won't immediately flip someone to "Offline", it just stops refreshing until the 5-minute
   window elapses. "Total Users" and "Online Now" stat cards sit at the top of the page too.
+  Timestamps (`last login`, `last active`, and `created at` on Clients) are stored in ISO 8601
+  format so they parse back reliably regardless of day/month order — display formatting into a
+  readable local date/time happens only in the UI, never in the sheet itself. If you're upgrading
+  from an earlier version of this app, any rows written before this fix may show "Offline"/raw
+  text until they're naturally overwritten (e.g. a client's `created at` only updates if you edit
+  and re-save that client; a user's `last login`/`last active` fix themselves automatically the
+  next time they log in).
 - **Lead Form**: an expandable nav section with two sub-pages, "FAT Contouring" and "Body
   Fillers", reading from a **separate Google Sheet file** (its own `GOOGLE_LEADS_SHEET_ID`, see
   setup section 1b) rather than the main one used everywhere else — `lib/googleSheets.js` accepts

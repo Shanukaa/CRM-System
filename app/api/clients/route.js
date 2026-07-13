@@ -63,7 +63,7 @@ export async function POST(req) {
     gender: body.gender || '',
     language: body.language || '',
     platform: body.platform || '',
-    'created at': new Date().toLocaleString('en-GB'),
+    'created at': new Date().toISOString(),
     status: body.status || 'Active',
   };
   await appendRow('Clients', record);

@@ -17,7 +17,7 @@ export async function POST(req) {
   const usertype = (user.usertype || '').toLowerCase();
   const token = await createSessionToken({ id: user.ID, username: user.username, usertype });
 
-  const now = new Date().toLocaleString('en-GB');
+  const now = new Date().toISOString();
   try {
     await updateRowById('Users', user.ID, { 'last login': now, 'last active': now });
   } catch {

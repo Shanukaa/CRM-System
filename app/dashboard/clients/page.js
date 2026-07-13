@@ -10,6 +10,7 @@ import ClientFormModal from '@/components/ClientFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { CLIENT_COLUMNS } from '@/lib/constants';
 import { exportToExcel } from '@/lib/exportClient';
+import { formatDateTime } from '@/lib/format';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 
 const DEFAULT_VISIBLE = CLIENT_COLUMNS.map((c) => c.key);
@@ -154,6 +155,8 @@ export default function ClientsPage() {
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${row.status?.toLowerCase() === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
                             {row.status}
                           </span>
+                        ) : c.key === 'created at' ? (
+                          formatDateTime(row['created at'])
                         ) : (
                           row[c.key]
                         )}

@@ -7,7 +7,7 @@ export async function POST() {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    await updateRowById('Users', session.id, { 'last active': new Date().toLocaleString('en-GB') });
+    await updateRowById('Users', session.id, { 'last active': new Date().toISOString() });
   } catch {
     // Best-effort — a missed heartbeat shouldn't break anything else.
   }
