@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Eye, EyeOff, UserCog, CalendarCheck2 } from 'lucide-react';
+import { RefreshCw, Plus, Eye, EyeOff, UserCog, CalendarCheck2, Pencil, Trash2 } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import UserFormModal from '@/components/UserFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -121,8 +121,12 @@ export default function UsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <button onClick={() => { setEditing(u); setFormOpen(true); }} className="text-brand-600 text-xs font-medium hover:underline">Edit</button>
-                        <button onClick={() => setDeleting(u)} className="text-rose-500 text-xs font-medium hover:underline">Delete</button>
+                        <button onClick={() => { setEditing(u); setFormOpen(true); }} className="flex items-center gap-1 text-brand-600 text-xs font-medium hover:underline">
+                          <Pencil size={13} /> Edit
+                        </button>
+                        <button onClick={() => setDeleting(u)} className="flex items-center gap-1 text-rose-500 text-xs font-medium hover:underline">
+                          <Trash2 size={13} /> Delete
+                        </button>
                       </div>
                     </td>
                   </tr>

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Download, Users, UserCheck, UserX, Phone, ArrowUpDown } from 'lucide-react';
+import { RefreshCw, Plus, Download, Users, UserCheck, UserX, Phone, Pencil, Trash2 } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
@@ -161,9 +161,13 @@ export default function ClientsPage() {
                     ))}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <button onClick={() => { setEditing(row); setFormOpen(true); }} className="text-brand-600 text-xs font-medium hover:underline">Edit</button>
+                        <button onClick={() => { setEditing(row); setFormOpen(true); }} className="flex items-center gap-1 text-brand-600 text-xs font-medium hover:underline">
+                          <Pencil size={13} /> Edit
+                        </button>
                         {user?.usertype === 'admin' && (
-                          <button onClick={() => setDeleting(row)} className="text-rose-500 text-xs font-medium hover:underline">Delete</button>
+                          <button onClick={() => setDeleting(row)} className="flex items-center gap-1 text-rose-500 text-xs font-medium hover:underline">
+                            <Trash2 size={13} /> Delete
+                          </button>
                         )}
                       </div>
                     </td>
