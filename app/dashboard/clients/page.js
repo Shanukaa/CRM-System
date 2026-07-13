@@ -161,12 +161,12 @@ export default function ClientsPage() {
                     ))}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <button onClick={() => { setEditing(row); setFormOpen(true); }} className="flex items-center gap-1 text-brand-600 text-xs font-medium hover:underline">
-                          <Pencil size={13} /> Edit
+                        <button onClick={() => { setEditing(row); setFormOpen(true); }} title="Edit" className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50">
+                          <Pencil size={15} />
                         </button>
                         {user?.usertype === 'admin' && (
-                          <button onClick={() => setDeleting(row)} className="flex items-center gap-1 text-rose-500 text-xs font-medium hover:underline">
-                            <Trash2 size={13} /> Delete
+                          <button onClick={() => setDeleting(row)} title="Delete" className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50">
+                            <Trash2 size={15} />
                           </button>
                         )}
                       </div>

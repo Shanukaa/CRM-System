@@ -151,8 +151,8 @@ export default function LeadsTable({ title, subtitle, tableSlug, columns, storag
                     ))}
                     {editableFields.length > 0 && (
                       <td className="px-4 py-3">
-                        <button onClick={() => setEditing(row)} className="flex items-center gap-1 text-brand-600 text-xs font-medium hover:underline">
-                          <Pencil size={13} /> Edit
+                        <button onClick={() => setEditing(row)} title="Edit" className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50">
+                          <Pencil size={15} />
                         </button>
                       </td>
                     )}
