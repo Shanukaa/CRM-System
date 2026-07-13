@@ -167,6 +167,12 @@ added to the `Users` sheet.
     date to go back to normal.
   - **Today's Leads**: a dedicated stat card next to Total Leads always reflects today's count,
     independent of whatever date filter you currently have applied to the table below it.
+  - **Lead Analytics**: a third page under "Lead Form" in the sidebar, combining data from both
+    sheets via a single `/api/leads/stats` call. Includes: total & today's lead counts split by
+    type, a 14-day volume trend comparing FAT Contouring vs. Body Fillers, a "Leads by Platform"
+    chart, and — the main one — a **"Leads by City"** chart showing the top 10 cities leads are
+    coming from (city names are grouped case-insensitively so "Colombo" and "colombo" count as
+    the same city, combined across both lead types).
 - **Auth**: username/password checked against the `Users` sheet; a signed JWT is set as an
   HTTP-only cookie (12h expiry). Middleware (`middleware.js`) protects all `/dashboard/*` routes
   and blocks non-admins from `/dashboard/users`.

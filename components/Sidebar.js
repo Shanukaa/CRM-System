@@ -20,6 +20,7 @@ export default function Sidebar({ user }) {
   }
 
   const leadLinks = [
+    { href: '/dashboard/leads/analytics', label: 'Analytics' },
     { href: '/dashboard/leads/fat-contouring', label: 'FAT Contouring' },
     { href: '/dashboard/leads/body-fillers', label: 'Body Fillers' },
   ];
