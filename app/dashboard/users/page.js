@@ -1,9 +1,19 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Eye, EyeOff, UserCog, CalendarCheck2, Pencil, Trash2 } from 'lucide-react';
+import { RefreshCw, Plus, Eye, EyeOff, UserCog, CalendarCheck2, Pencil, Trash2, Radio } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import UserFormModal from '@/components/UserFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
+
+const ONLINE_WINDOW_MS = 5 * 60 * 1000; // consider "online" if active within the last 5 minutes
+
+function isOnline(u) {
+  const raw = u['last active'];
+  if (!raw) return false;
+  const d = new Date(raw);
+  if (isNaN(d)) return false;
+  return Date.now() - d.getTime() < ONLINE_WINDOW_MS;
+}
 
 export default function UsersPage() {
   const [perf, setPerf] = useState([]);
@@ -32,7 +42,13 @@ export default function UsersPage() {
     setLoading(false);
   }
 
-  useEffect(() => { loadPerf(); loadUsers(); }, []);
+  useEffect(() => {
+    loadPerf();
+    loadUsers();
+    // Refresh periodically so "Online now" stays reasonably current while this page is open.
+    const interval = setInterval(loadUsers, 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   async function handleDelete() {
     if (!deleting) return;
@@ -43,6 +59,7 @@ export default function UsersPage() {
   }
 
   const totalAppointmentsUpdated = perf.reduce((sum, p) => sum + (p.appointmentsCreated || 0), 0);
+  const onlineCount = users.filter(isOnline).length;
 
   return (
     <div>
@@ -52,13 +69,14 @@ export default function UsersPage() {
       <h2 className="text-sm font-semibold text-slate-600 mb-3">User Performance</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard label="Total Users" value={users.length || '—'} icon={UserCog} />
-        <StatCard label="Appointments Logged" value={totalAppointmentsUpdated} accent="green" icon={CalendarCheck2} />
-        {perf.slice(0, 2).map((p) => (
+        <StatCard label="Online Now" value={onlineCount} accent="green" icon={Radio} />
+        <StatCard label="Appointments Logged" value={totalAppointmentsUpdated} accent="amber" icon={CalendarCheck2} />
+        {perf.slice(0, 1).map((p) => (
           <StatCard key={p.username} label={`${p.username}'s Appointments`} value={p.appointmentsCreated} accent="amber" />
         ))}
       </div>
 
-      {perf.length > 2 && (
+      {perf.length > 1 && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-soft p-4 mb-6">
           <p className="text-xs font-semibold text-slate-500 mb-3">Appointments logged per user</p>
           <div className="space-y-2">
@@ -93,44 +111,56 @@ export default function UsersPage() {
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">NIC</th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">Password</th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">User Type</th>
+                <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">Status</th>
+                <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">Last Login</th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="text-center py-8 text-slate-400">Loading...</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-slate-400">Loading...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-8 text-slate-400">No users found</td></tr>
+                <tr><td colSpan={7} className="text-center py-8 text-slate-400">No users found</td></tr>
               ) : (
-                users.map((u) => (
-                  <tr key={u.ID} className="border-b border-slate-50 hover:bg-slate-50">
-                    <td className="px-4 py-3 whitespace-nowrap">{u.username}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">{u.nic}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs">{revealed[u.ID] ? u.password : '••••••••'}</span>
-                        <button onClick={() => setRevealed((r) => ({ ...r, [u.ID]: !r[u.ID] }))} className="text-slate-400 hover:text-slate-600">
-                          {revealed[u.ID] ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </button>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${u.usertype === 'admin' ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-500'}`}>
-                        {u.usertype}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <button onClick={() => { setEditing(u); setFormOpen(true); }} title="Edit" className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50">
-                          <Pencil size={15} />
-                        </button>
-                        <button onClick={() => setDeleting(u)} title="Delete" className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50">
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                users.map((u) => {
+                  const online = isOnline(u);
+                  return (
+                    <tr key={u.ID} className="border-b border-slate-50 hover:bg-slate-50">
+                      <td className="px-4 py-3 whitespace-nowrap">{u.username}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">{u.nic}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs">{revealed[u.ID] ? u.password : '••••••••'}</span>
+                          <button onClick={() => setRevealed((r) => ({ ...r, [u.ID]: !r[u.ID] }))} className="text-slate-400 hover:text-slate-600">
+                            {revealed[u.ID] ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${u.usertype === 'admin' ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-500'}`}>
+                          {u.usertype}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${online ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${online ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                          {online ? 'Online' : 'Offline'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-slate-500">{u['last login'] || 'Never'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <button onClick={() => { setEditing(u); setFormOpen(true); }} title="Edit" className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50">
+                            <Pencil size={15} />
+                          </button>
+                          <button onClick={() => setDeleting(u)} title="Delete" className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50">
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, CalendarCheck, LogOut, UserCog, Menu, X, Stethoscope, ClipboardList, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Sidebar({ user }) {
   const pathname = usePathname();
@@ -11,7 +11,7 @@ export default function Sidebar({ user }) {
   const [leadsOpen, setLeadsOpen] = useState(pathname.startsWith('/dashboard/leads'));
 
   const links = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: user.usertype === 'admin' ? '/dashboard' : '/dashboard/welcome', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/dashboard/clients', label: 'Client List', icon: Users },
     { href: '/dashboard/appointments', label: 'Appointment List', icon: CalendarCheck },
   ];
@@ -20,11 +20,23 @@ export default function Sidebar({ user }) {
   }
 
   const leadLinks = [
-    { href: '/dashboard/leads/analytics', label: 'Analytics' },
+    ...(user.usertype === 'admin' ? [{ href: '/dashboard/leads/analytics', label: 'Analytics' }] : []),
     { href: '/dashboard/leads/fat-contouring', label: 'FAT Contouring' },
     { href: '/dashboard/leads/body-fillers', label: 'Body Fillers' },
   ];
   const leadsActive = pathname.startsWith('/dashboard/leads');
+
+  // Lets the Users page show who's currently active. Sidebar stays mounted across
+  // client-side navigation within /dashboard/*, so this keeps pinging as long as
+  // the person has any dashboard page open.
+  useEffect(() => {
+    function ping() {
+      fetch('/api/auth/heartbeat', { method: 'POST' }).catch(() => {});
+    }
+    ping();
+    const interval = setInterval(ping, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   async function logout() {
     await fetch('/api/auth/logout', { method: 'POST' });

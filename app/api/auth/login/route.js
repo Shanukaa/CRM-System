@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSheetRows } from '@/lib/googleSheets';
+import { getSheetRows, updateRowById } from '@/lib/googleSheets';
 import { createSessionToken } from '@/lib/session';
 
 export async function POST(req) {
@@ -16,6 +16,13 @@ export async function POST(req) {
 
   const usertype = (user.usertype || '').toLowerCase();
   const token = await createSessionToken({ id: user.ID, username: user.username, usertype });
+
+  const now = new Date().toLocaleString('en-GB');
+  try {
+    await updateRowById('Users', user.ID, { 'last login': now, 'last active': now });
+  } catch {
+    // Don't block login if this write fails — just means presence data is briefly stale.
+  }
 
   const res = NextResponse.json({ success: true, usertype });
   res.cookies.set('session', token, {

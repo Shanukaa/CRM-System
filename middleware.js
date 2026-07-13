@@ -11,12 +11,18 @@ export async function middleware(req) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
     if (pathname.startsWith('/dashboard/users') && session.usertype !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+      return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
+    }
+    if (pathname === '/dashboard' && session.usertype !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
+    }
+    if (pathname.startsWith('/dashboard/leads/analytics') && session.usertype !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
     }
   }
 
   if (pathname === '/login' && session) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
+    return NextResponse.redirect(new URL(session.usertype === 'admin' ? '/dashboard' : '/dashboard/welcome', req.url));
   }
 
   return NextResponse.next();

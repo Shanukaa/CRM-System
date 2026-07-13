@@ -33,8 +33,12 @@ Website, Social Media, Referral, Other) — separate from the client's own `plat
 
 ### Tab: `Users`
 ```
-ID | username | nic | password | usertype
+ID | username | nic | password | usertype | last login | last active
 ```
+`last login` and `last active` power the "who's logged in" feature described below — the app
+writes to them automatically, you don't fill them in yourself. (If you don't add these two
+columns, the rest of the app still works fine; the Users page will just show "Never" and
+"Offline" for everyone.)
 Add at least one row here yourself so you can log in — set `usertype` to `admin`, e.g.:
 ```
 ID: (leave blank, or any unique text)   username: admin   nic: 123456789V   password: admin123   usertype: admin
@@ -141,6 +145,20 @@ added to the `Users` sheet.
 
 ## How it's structured
 
+- **Analytics is admin-only**: the main Dashboard (stat cards + 5 charts) and Lead Analytics are
+  both restricted to admins — enforced in `middleware.js`, so an employee hitting either URL
+  directly gets redirected, not just hidden from the nav. Employees land on a simple, chart-free
+  **Welcome** page (`/dashboard/welcome`) after login instead, with quick links to Client List and
+  Appointment List. The sidebar's "Dashboard" link and the admin-only "Analytics" sub-link under
+  Lead Form adjust automatically based on who's logged in.
+- **Who's logged in**: the Users page (admin-only) shows a **Status** column (Online/Offline) and
+  **Last Login** per user. "Online" means active within the last 5 minutes — the sidebar pings a
+  lightweight `/api/auth/heartbeat` endpoint every 2 minutes for as long as someone has any
+  dashboard page open (the sidebar persists across navigation, so this doesn't need every single
+  page to implement it separately), writing to the `last active` column. `last login` is set once,
+  at sign-in. This is a best-effort presence indicator, not a guaranteed real-time system — closing
+  the tab won't immediately flip someone to "Offline", it just stops refreshing until the 5-minute
+  window elapses. "Total Users" and "Online Now" stat cards sit at the top of the page too.
 - **Lead Form**: an expandable nav section with two sub-pages, "FAT Contouring" and "Body
   Fillers", reading from a **separate Google Sheet file** (its own `GOOGLE_LEADS_SHEET_ID`, see
   setup section 1b) rather than the main one used everywhere else — `lib/googleSheets.js` accepts
