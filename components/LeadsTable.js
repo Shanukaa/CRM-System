@@ -12,7 +12,7 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export default function LeadsTable({ title, subtitle, tableSlug, columns, storageKey, defaultVisible, editableColumns = [] }) {
+export default function LeadsTable({ title, subtitle, tableSlug, columns, storageKey, defaultVisible, editableColumns = [], checkboxColumns = [] }) {
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -171,6 +171,7 @@ export default function LeadsTable({ title, subtitle, tableSlug, columns, storag
           row={editing}
           fields={editableFields}
           tableSlug={tableSlug}
+          checkboxFields={checkboxColumns}
           onClose={() => setEditing(null)}
           onSaved={() => { setEditing(null); loadRows(); }}
         />

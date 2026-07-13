@@ -1,6 +1,6 @@
 'use client';
 import LeadsTable from '@/components/LeadsTable';
-import { BODY_FILLERS_COLUMNS, BODY_FILLERS_DEFAULT_VISIBLE, BODY_FILLERS_EDITABLE } from '@/lib/constants';
+import { BODY_FILLERS_COLUMNS, BODY_FILLERS_DEFAULT_VISIBLE, BODY_FILLERS_EDITABLE, BODY_FILLERS_CHECKBOX_FIELDS } from '@/lib/constants';
 
 export default function BodyFillersLeadsPage() {
   return (
@@ -12,6 +12,7 @@ export default function BodyFillersLeadsPage() {
       storageKey="leadsBodyFillersColumns"
       defaultVisible={BODY_FILLERS_DEFAULT_VISIBLE}
       editableColumns={BODY_FILLERS_EDITABLE}
+      checkboxColumns={BODY_FILLERS_CHECKBOX_FIELDS}
     />
   );
 }

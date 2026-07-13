@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Modal from './Modal';
 
-export default function LeadEditModal({ row, fields, tableSlug, onClose, onSaved }) {
+export default function LeadEditModal({ row, fields, tableSlug, checkboxFields = [], onClose, onSaved }) {
   const [values, setValues] = useState(() => Object.fromEntries(fields.map((f) => [f.key, row[f.key] || ''])));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -35,16 +35,33 @@ export default function LeadEditModal({ row, fields, tableSlug, onClose, onSaved
   return (
     <Modal title={`Edit Lead — ${row.full_name || ''}`} onClose={onClose}>
       <form onSubmit={submit} className="space-y-4">
-        {fields.map((f) => (
-          <div key={f.key}>
-            <label className="block text-xs font-medium text-slate-500 mb-1">{f.label}</label>
-            <input
-              value={values[f.key]}
-              onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
-            />
-          </div>
-        ))}
+        {fields.map((f) => {
+          const isCheckbox = checkboxFields.includes(f.key);
+          return (
+            <div key={f.key}>
+              {isCheckbox ? (
+                <label className="flex items-center gap-2.5 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={values[f.key] === 'Yes'}
+                    onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.checked ? 'Yes' : 'No' }))}
+                    className="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
+                  />
+                  {f.label}
+                </label>
+              ) : (
+                <>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">{f.label}</label>
+                  <input
+                    value={values[f.key]}
+                    onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
+                  />
+                </>
+              )}
+            </div>
+          );
+        })}
         {error && <p className="text-xs text-rose-500">{error}</p>}
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50">Cancel</button>
