@@ -153,8 +153,8 @@ added to the `Users` sheet.
     Clients/Appointments.
   - **Editable follow-up columns**: on FAT Contouring, "1st Status" and "2nd Status" are
     editable; on Body Fillers, "Note", "Staff", "Call 01", "Call 02", and "Call 03" are editable
-    — the three Call fields are checkboxes (stored as `Yes`/`No` in the sheet, so it's still
-    readable if anyone opens the sheet directly), the rest are plain text fields. Both tables have
+    — the three Call fields are checkboxes (stored as `TRUE`/`FALSE` in the sheet, matching
+    Google Sheets' native checkbox format), the rest are plain text fields. Both tables have
     an **Actions** column with an **Edit** button that opens a small form for just those fields —
     everything else in the row stays read-only, since that data is meant to arrive from an
     external source (e.g. a Facebook Lead Ads export or automation) and shouldn't be hand-edited.

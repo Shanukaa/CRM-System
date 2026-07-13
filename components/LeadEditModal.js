@@ -43,8 +43,8 @@ export default function LeadEditModal({ row, fields, tableSlug, checkboxFields =
                 <label className="flex items-center gap-2.5 text-sm text-slate-700">
                   <input
                     type="checkbox"
-                    checked={values[f.key] === 'Yes'}
-                    onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.checked ? 'Yes' : 'No' }))}
+                    checked={String(values[f.key]).toUpperCase() === 'TRUE'}
+                    onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.checked ? 'TRUE' : 'FALSE' }))}
                     className="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-400"
                   />
                   {f.label}
