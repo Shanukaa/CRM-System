@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, updateRowById } from '@/lib/googleSheets';
 import { createSessionToken } from '@/lib/session';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 
-export async function POST(req) {
+export const POST = withErrorHandling(async (req) => {
   const { username, password } = await req.json();
   if (!username || !password) {
     return NextResponse.json({ error: 'Username and password required' }, { status: 400 });
@@ -33,4 +34,4 @@ export async function POST(req) {
     maxAge: 60 * 60 * 12,
   });
   return res;
-}
+});

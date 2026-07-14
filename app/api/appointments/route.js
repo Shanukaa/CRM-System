@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, appendRow, updateRowById } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 import { v4 as uuidv4 } from 'uuid';
 
 const PAGE_SIZE = 15;
 
-export async function GET(req) {
+export const GET = withErrorHandling(async (req) => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -47,9 +48,9 @@ export async function GET(req) {
     pageSize: PAGE_SIZE,
     totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
   });
-}
+});
 
-export async function POST(req) {
+export const POST = withErrorHandling(async (req) => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -84,7 +85,7 @@ export async function POST(req) {
   }
 
   return NextResponse.json({ success: true, data: record });
-}
+});
 
 function normalizeDate(v) {
   if (!v) return '';

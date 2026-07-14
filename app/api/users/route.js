@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, appendRow } from '@/lib/googleSheets';
 import { requireAdmin } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 import { v4 as uuidv4 } from 'uuid';
 
-export async function GET() {
+export const GET = withErrorHandling(async () => {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -14,9 +15,9 @@ export async function GET() {
       return rest;
     }),
   });
-}
+});
 
-export async function POST(req) {
+export const POST = withErrorHandling(async (req) => {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -39,4 +40,4 @@ export async function POST(req) {
   };
   await appendRow('Users', record);
   return NextResponse.json({ success: true });
-}
+});

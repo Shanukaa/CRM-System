@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 
 const LEADS_SHEET_ID = process.env.GOOGLE_LEADS_SHEET_ID;
 
-export async function GET() {
+export const GET = withErrorHandling(async () => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!LEADS_SHEET_ID) {
@@ -73,7 +74,7 @@ export async function GET() {
     byPlatform,
     trend,
   });
-}
+});
 
 function toDateKey(d) {
   if (!d) return '';

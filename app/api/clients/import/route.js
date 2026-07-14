@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, appendRows } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 import { v4 as uuidv4 } from 'uuid';
 
 const MAX_ROWS = 500;
 
-export async function POST(req) {
+export const POST = withErrorHandling(async (req) => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -46,4 +47,4 @@ export async function POST(req) {
   if (valid.length) await appendRows('Clients', valid);
 
   return NextResponse.json({ success: true, imported: valid.length, skipped });
-}
+});

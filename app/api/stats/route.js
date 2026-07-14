@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 
-export async function GET(req) {
+export const GET = withErrorHandling(async (req) => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -17,7 +18,7 @@ export async function GET(req) {
   }
 
   return NextResponse.json({ error: 'Unknown stats type' }, { status: 400 });
-}
+});
 
 async function clientStats() {
   const { rows } = await getSheetRows('Clients');

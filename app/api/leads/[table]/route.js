@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, updateCell } from '@/lib/googleSheets';
 import { requireSession } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 import { FAT_CONTOURING_EDITABLE, BODY_FILLERS_EDITABLE } from '@/lib/constants';
 
 const PAGE_SIZE = 15;
@@ -19,7 +20,7 @@ const EDITABLE_MAP = {
 
 const LEADS_SHEET_ID = process.env.GOOGLE_LEADS_SHEET_ID;
 
-export async function GET(req, { params }) {
+export const GET = withErrorHandling(async (req, { params }) => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -71,9 +72,9 @@ export async function GET(req, { params }) {
     pageSize: PAGE_SIZE,
     totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
   });
-}
+});
 
-export async function PATCH(req, { params }) {
+export const PATCH = withErrorHandling(async (req, { params }) => {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -103,7 +104,7 @@ export async function PATCH(req, { params }) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
-}
+});
 
 function cleanRow(r) {
   const { _rowNumber, ...rest } = r;

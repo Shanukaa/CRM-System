@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { updateRowById, deleteRowById } from '@/lib/googleSheets';
 import { requireAdmin } from '@/lib/apiAuth';
+import { withErrorHandling } from '@/lib/withErrorHandling';
 
-export async function PUT(req, { params }) {
+export const PUT = withErrorHandling(async (req, { params }) => {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -19,9 +20,9 @@ export async function PUT(req, { params }) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 404 });
   }
-}
+});
 
-export async function DELETE(req, { params }) {
+export const DELETE = withErrorHandling(async (req, { params }) => {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
@@ -31,4 +32,4 @@ export async function DELETE(req, { params }) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 404 });
   }
-}
+});
