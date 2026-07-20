@@ -19,6 +19,9 @@ export async function middleware(req) {
     if (pathname.startsWith('/dashboard/leads/analytics') && session.usertype !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
     }
+    if (pathname.startsWith('/dashboard/daily-records/analytics') && session.usertype !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
+    }
   }
 
   if (pathname === '/login' && session) {

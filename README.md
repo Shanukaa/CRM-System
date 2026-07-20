@@ -50,6 +50,14 @@ row the app creates will get a proper unique ID automatically.)
 > (no database). Anyone with edit access to the sheet can read them. If this matters for your use
 > case, consider restricting sheet access tightly, or ask me to add password hashing later.
 
+### Tab: `Daily Records`
+```
+ID | date | messages | calls | leads | total | created by
+```
+Manually logged daily activity (Messages/Calls/Leads), entered by staff through the app — `total`
+is always calculated automatically as `messages + calls + leads`, never typed in directly (this
+avoids the totals silently drifting out of sync with the three numbers behind them).
+
 ---
 
 ## 1b. (Optional) Set up the separate Leads Google Sheet
@@ -144,6 +152,14 @@ added to the `Users` sheet.
 ---
 
 ## How it's structured
+
+- **Daily Records**: a new expandable nav section for manually logging daily Messages/Calls/Leads
+  activity. Both admins and employees can add/edit records (delete is admin-only, same convention
+  as everywhere else); "Total" is always server-computed as the sum of the other three, so it can
+  never be typed in inconsistently. The "Analytics" sub-page (admin-only, like the other analytics
+  areas) shows total counts, a 14-day activity trend chart, and a **Performance by Staff** chart —
+  a stacked bar per person based on the `created by` column, letting an admin see who's logging
+  the most activity.
 
 - **Analytics is admin-only**: the main Dashboard (stat cards + 5 charts) and Lead Analytics are
   both restricted to admins — enforced in `middleware.js`, so an employee hitting either URL
