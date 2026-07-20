@@ -38,7 +38,8 @@ export const GET = withErrorHandling(async () => {
   const trend = days.map((d) => {
     const key = toDateKey(d);
     const entry = byDateKey.get(key) || { messages: 0, calls: 0, leads: 0, appointmentsEntered: 0 };
-    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry };
+    const activityTotal = entry.messages + entry.calls + entry.leads;
+    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry, activityTotal };
   });
 
   return NextResponse.json({ totals, trend, recordCount: rows.length });

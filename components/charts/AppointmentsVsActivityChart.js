@@ -5,7 +5,7 @@ export default function AppointmentsVsActivityChart({ data }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-soft p-5">
       <p className="text-sm font-semibold text-slate-700">Appointments Entered vs Activity</p>
-      <p className="text-xs text-slate-400 mb-4">Appointments entered compared to messages, calls, and leads — last 14 days</p>
+      <p className="text-xs text-slate-400 mb-4">Appointments entered compared to total activity (messages + calls + leads) — last 14 days</p>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data} margin={{ top: 5, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -20,9 +20,7 @@ export default function AppointmentsVsActivityChart({ data }) {
             formatter={(value) => <span className="text-xs text-slate-600">{value}</span>}
           />
           <Bar dataKey="appointmentsEntered" name="Appointments Entered" fill="#f43f5e" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="messages" name="Messages" fill="#6152f7" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="calls" name="Calls" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="leads" name="Leads" fill="#22c55e" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="activityTotal" name="Total Activity" fill="#6152f7" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
