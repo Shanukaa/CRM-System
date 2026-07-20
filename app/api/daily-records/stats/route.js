@@ -8,21 +8,13 @@ export const GET = withErrorHandling(async () => {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { rows } = await getSheetRows('Daily Records');
-  const { rows: appointments } = await getSheetRows('Appointments');
-
-  const apptCountByDate = new Map();
-  appointments.forEach((a) => {
-    const key = normalizeDate(a['created at']);
-    if (!key) return;
-    apptCountByDate.set(key, (apptCountByDate.get(key) || 0) + 1);
-  });
 
   const sum = (key) => rows.reduce((total, r) => total + (Number(r[key]) || 0), 0);
   const totals = {
     messages: sum('messages'),
     calls: sum('calls'),
     leads: sum('leads'),
-    appointmentsEntered: appointments.filter((a) => normalizeDate(a['created at'])).length,
+    appointmentsEntered: sum('appointmentsEntered'),
     total: sum('total'),
   };
 
@@ -36,17 +28,17 @@ export const GET = withErrorHandling(async () => {
   rows.forEach((r) => {
     const key = normalizeDate(r.date);
     if (!key) return;
-    const existing = byDateKey.get(key) || { messages: 0, calls: 0, leads: 0 };
+    const existing = byDateKey.get(key) || { messages: 0, calls: 0, leads: 0, appointmentsEntered: 0 };
     existing.messages += Number(r.messages) || 0;
     existing.calls += Number(r.calls) || 0;
     existing.leads += Number(r.leads) || 0;
+    existing.appointmentsEntered += Number(r.appointmentsEntered) || 0;
     byDateKey.set(key, existing);
   });
   const trend = days.map((d) => {
     const key = toDateKey(d);
-    const entry = byDateKey.get(key) || { messages: 0, calls: 0, leads: 0 };
-    const appointmentsEntered = apptCountByDate.get(key) || 0;
-    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry, appointmentsEntered };
+    const entry = byDateKey.get(key) || { messages: 0, calls: 0, leads: 0, appointmentsEntered: 0 };
+    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry };
   });
 
   return NextResponse.json({ totals, trend, recordCount: rows.length });

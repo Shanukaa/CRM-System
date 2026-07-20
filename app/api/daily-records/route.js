@@ -17,8 +17,6 @@ export const GET = withErrorHandling(async (req) => {
   const all = searchParams.get('all') === 'true';
 
   const { rows } = await getSheetRows('Daily Records');
-  const { rows: appointments } = await getSheetRows('Appointments');
-  const apptCountByDate = buildApptCountByDate(appointments);
 
   let filtered = rows;
   if (q) {
@@ -33,7 +31,7 @@ export const GET = withErrorHandling(async (req) => {
   const pageRows = all ? filtered : filtered.slice((page - 1) * PAGE_SIZE, (page - 1) * PAGE_SIZE + PAGE_SIZE);
 
   return NextResponse.json({
-    data: pageRows.map((r) => withAppointmentsEntered(cleanRow(r), apptCountByDate)),
+    data: pageRows.map(cleanRow),
     total,
     page,
     pageSize: PAGE_SIZE,
@@ -60,6 +58,7 @@ export const POST = withErrorHandling(async (req) => {
   const messages = toNonNegativeInt(body.messages);
   const calls = toNonNegativeInt(body.calls);
   const leads = toNonNegativeInt(body.leads);
+  const appointmentsEntered = toNonNegativeInt(body.appointmentsEntered);
 
   const record = {
     ID: uuidv4(),
@@ -67,6 +66,7 @@ export const POST = withErrorHandling(async (req) => {
     messages,
     calls,
     leads,
+    appointmentsEntered,
     total: messages + calls + leads, // always server-computed — never trust a client-supplied total
   };
   await appendRow('Daily Records', record);
@@ -87,20 +87,4 @@ function normalizeDate(v) {
   if (!v) return '';
   const d = new Date(v);
   return isNaN(d) ? v : d.toISOString().slice(0, 10);
-}
-
-// Counts how many appointments were entered (created) on each date, keyed by normalized date.
-function buildApptCountByDate(appointments) {
-  const map = new Map();
-  appointments.forEach((a) => {
-    const key = normalizeDate(a['created at']);
-    if (!key) return;
-    map.set(key, (map.get(key) || 0) + 1);
-  });
-  return map;
-}
-
-// appointmentsEntered is always derived from the Appointments sheet — never stored on the row itself.
-function withAppointmentsEntered(row, apptCountByDate) {
-  return { ...row, appointmentsEntered: apptCountByDate.get(normalizeDate(row.date)) || 0 };
 }

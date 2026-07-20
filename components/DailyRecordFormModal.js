@@ -8,6 +8,7 @@ export default function DailyRecordFormModal({ initial, onClose, onSaved }) {
     messages: initial?.messages ?? '',
     calls: initial?.calls ?? '',
     leads: initial?.leads ?? '',
+    appointmentsEntered: initial?.appointmentsEntered ?? '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -26,7 +27,13 @@ export default function DailyRecordFormModal({ initial, onClose, onSaved }) {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: form.date, messages: num(form.messages), calls: num(form.calls), leads: num(form.leads) }),
+        body: JSON.stringify({
+          date: form.date,
+          messages: num(form.messages),
+          calls: num(form.calls),
+          leads: num(form.leads),
+          appointmentsEntered: num(form.appointmentsEntered),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save');
@@ -54,6 +61,7 @@ export default function DailyRecordFormModal({ initial, onClose, onSaved }) {
         <NumberField label="Messages" value={form.messages} onChange={(v) => set('messages', v)} />
         <NumberField label="Calls" value={form.calls} onChange={(v) => set('calls', v)} />
         <NumberField label="Leads" value={form.leads} onChange={(v) => set('leads', v)} />
+        <NumberField label="Appointments Entered" value={form.appointmentsEntered} onChange={(v) => set('appointmentsEntered', v)} />
         <div>
           <label className="block text-xs font-medium text-slate-500 mb-1">Total</label>
           <div className="w-full border border-slate-200 bg-slate-50 rounded-xl px-3 py-2 text-sm text-slate-600 font-medium">

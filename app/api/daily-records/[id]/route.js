@@ -22,6 +22,7 @@ export const PUT = withErrorHandling(async (req, { params }) => {
   const messages = toNonNegativeInt(body.messages);
   const calls = toNonNegativeInt(body.calls);
   const leads = toNonNegativeInt(body.leads);
+  const appointmentsEntered = toNonNegativeInt(body.appointmentsEntered);
 
   try {
     await updateRowById('Daily Records', params.id, {
@@ -29,6 +30,7 @@ export const PUT = withErrorHandling(async (req, { params }) => {
       messages,
       calls,
       leads,
+      appointmentsEntered,
       total: messages + calls + leads,
     });
     return NextResponse.json({ success: true });
