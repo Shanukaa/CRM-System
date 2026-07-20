@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { MessageSquare, Phone, UserPlus, CalendarPlus, Sigma } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import DailyActivityChart from '@/components/charts/DailyActivityChart';
+import AppointmentsEnteredChart from '@/components/charts/AppointmentsEnteredChart';
 import AppointmentsVsActivityChart from '@/components/charts/AppointmentsVsActivityChart';
 
 export default function DailyRecordsAnalyticsPage() {
@@ -43,6 +44,7 @@ export default function DailyRecordsAnalyticsPage() {
             {stats ? (
               <>
                 <DailyActivityChart data={stats.trend} />
+                <AppointmentsEnteredChart data={stats.trend} />
                 <AppointmentsVsActivityChart data={stats.trend} />
               </>
             ) : (
