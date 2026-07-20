@@ -47,6 +47,13 @@ export const POST = withErrorHandling(async (req) => {
     return NextResponse.json({ error: 'Date is required' }, { status: 400 });
   }
 
+  const { rows } = await getSheetRows('Daily Records');
+  const dateKey = normalizeDate(body.date);
+  const duplicate = rows.some((r) => normalizeDate(r.date) === dateKey);
+  if (duplicate) {
+    return NextResponse.json({ error: 'A record for this date already exists. Please edit the existing record instead.' }, { status: 409 });
+  }
+
   const messages = toNonNegativeInt(body.messages);
   const calls = toNonNegativeInt(body.calls);
   const leads = toNonNegativeInt(body.leads);
@@ -58,7 +65,6 @@ export const POST = withErrorHandling(async (req) => {
     calls,
     leads,
     total: messages + calls + leads, // always server-computed — never trust a client-supplied total
-    'created by': session.username,
   };
   await appendRow('Daily Records', record);
   return NextResponse.json({ success: true, data: record });

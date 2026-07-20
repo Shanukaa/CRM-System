@@ -39,20 +39,7 @@ export const GET = withErrorHandling(async () => {
     return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry };
   });
 
-  // Performance by staff member (who logged the record)
-  const staffMap = new Map();
-  rows.forEach((r) => {
-    const staff = r['created by'] || 'Unspecified';
-    const existing = staffMap.get(staff) || { staff, messages: 0, calls: 0, leads: 0, total: 0 };
-    existing.messages += Number(r.messages) || 0;
-    existing.calls += Number(r.calls) || 0;
-    existing.leads += Number(r.leads) || 0;
-    existing.total += Number(r.total) || 0;
-    staffMap.set(staff, existing);
-  });
-  const byStaff = Array.from(staffMap.values()).sort((a, b) => b.total - a.total);
-
-  return NextResponse.json({ totals, trend, byStaff, recordCount: rows.length });
+  return NextResponse.json({ totals, trend, recordCount: rows.length });
 });
 
 function toDateKey(d) {
