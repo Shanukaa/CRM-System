@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { MessageSquare, Phone, UserPlus, CalendarPlus, Sigma } from 'lucide-react';
 import StatCard from '@/components/StatCard';
+import DailyActivityChart from '@/components/charts/DailyActivityChart';
 import AppointmentsVsActivityChart from '@/components/charts/AppointmentsVsActivityChart';
 
 export default function DailyRecordsAnalyticsPage() {
@@ -40,7 +41,10 @@ export default function DailyRecordsAnalyticsPage() {
 
           <div className="grid grid-cols-1 gap-4">
             {stats ? (
-              <AppointmentsVsActivityChart data={stats.trend} />
+              <>
+                <DailyActivityChart data={stats.trend} />
+                <AppointmentsVsActivityChart data={stats.trend} />
+              </>
             ) : (
               <div className="h-[240px] flex items-center justify-center text-sm text-slate-400 bg-white rounded-2xl border border-slate-100">
                 Loading charts...
