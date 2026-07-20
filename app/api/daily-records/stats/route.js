@@ -8,16 +8,25 @@ export const GET = withErrorHandling(async () => {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { rows } = await getSheetRows('Daily Records');
+  const { rows: appointments } = await getSheetRows('Appointments');
+
+  const apptCountByDate = new Map();
+  appointments.forEach((a) => {
+    const key = normalizeDate(a['created at']);
+    if (!key) return;
+    apptCountByDate.set(key, (apptCountByDate.get(key) || 0) + 1);
+  });
 
   const sum = (key) => rows.reduce((total, r) => total + (Number(r[key]) || 0), 0);
   const totals = {
     messages: sum('messages'),
     calls: sum('calls'),
     leads: sum('leads'),
+    appointmentsEntered: appointments.filter((a) => normalizeDate(a['created at'])).length,
     total: sum('total'),
   };
 
-  // 14-day trend: messages/calls/leads per day
+  // 14-day trend: messages/calls/leads/appointments entered per day
   const days = Array.from({ length: 14 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (13 - i));
@@ -36,7 +45,8 @@ export const GET = withErrorHandling(async () => {
   const trend = days.map((d) => {
     const key = toDateKey(d);
     const entry = byDateKey.get(key) || { messages: 0, calls: 0, leads: 0 };
-    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry };
+    const appointmentsEntered = apptCountByDate.get(key) || 0;
+    return { date: d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }), ...entry, appointmentsEntered };
   });
 
   return NextResponse.json({ totals, trend, recordCount: rows.length });

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { RefreshCw, Plus, Download, MessageSquare, Phone, UserPlus, Sigma, Pencil, Trash2 } from 'lucide-react';
+import { RefreshCw, Plus, Download, MessageSquare, Phone, UserPlus, CalendarPlus, Sigma, Pencil, Trash2 } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
@@ -42,9 +42,10 @@ export default function DailyRecordsPage() {
       messages: acc.messages + (Number(r.messages) || 0),
       calls: acc.calls + (Number(r.calls) || 0),
       leads: acc.leads + (Number(r.leads) || 0),
+      appointmentsEntered: acc.appointmentsEntered + (Number(r.appointmentsEntered) || 0),
       total: acc.total + (Number(r.total) || 0),
     }),
-    { messages: 0, calls: 0, leads: 0, total: 0 }
+    { messages: 0, calls: 0, leads: 0, appointmentsEntered: 0, total: 0 }
   );
 
   async function handleDelete() {
@@ -66,10 +67,11 @@ export default function DailyRecordsPage() {
       <h1 className="text-xl font-bold text-slate-800 mb-1">Daily Records</h1>
       <p className="text-sm text-slate-500 mb-6">Manually logged messages, calls, and leads per day (this page).</p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <StatCard label="Messages (this page)" value={totals.messages} icon={MessageSquare} />
         <StatCard label="Calls (this page)" value={totals.calls} accent="amber" icon={Phone} />
         <StatCard label="Leads (this page)" value={totals.leads} accent="green" icon={UserPlus} />
+        <StatCard label="Appointments Entered (this page)" value={totals.appointmentsEntered} accent="amber" icon={CalendarPlus} />
         <StatCard label="Total (this page)" value={totals.total} icon={Sigma} />
       </div>
 

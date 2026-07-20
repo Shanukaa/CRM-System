@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { MessageSquare, Phone, UserPlus, Sigma } from 'lucide-react';
+import { MessageSquare, Phone, UserPlus, CalendarPlus, Sigma } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import DailyRecordsTrendChart from '@/components/charts/DailyRecordsTrendChart';
+import AppointmentsVsActivityChart from '@/components/charts/AppointmentsVsActivityChart';
 
 export default function DailyRecordsAnalyticsPage() {
   const [stats, setStats] = useState(null);
@@ -30,16 +31,20 @@ export default function DailyRecordsAnalyticsPage() {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-soft p-5 text-sm text-rose-500">{error}</div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             <StatCard label="Total Messages" value={stats?.totals.messages ?? '—'} icon={MessageSquare} />
             <StatCard label="Total Calls" value={stats?.totals.calls ?? '—'} accent="amber" icon={Phone} />
             <StatCard label="Total Leads" value={stats?.totals.leads ?? '—'} accent="green" icon={UserPlus} />
+            <StatCard label="Appointments Entered" value={stats?.totals.appointmentsEntered ?? '—'} accent="amber" icon={CalendarPlus} />
             <StatCard label="Grand Total" value={stats?.totals.total ?? '—'} icon={Sigma} />
           </div>
 
           <div className="grid grid-cols-1 gap-4">
             {stats ? (
-              <DailyRecordsTrendChart data={stats.trend} />
+              <>
+                <DailyRecordsTrendChart data={stats.trend} />
+                <AppointmentsVsActivityChart data={stats.trend} />
+              </>
             ) : (
               <div className="h-[240px] flex items-center justify-center text-sm text-slate-400 bg-white rounded-2xl border border-slate-100">
                 Loading charts...

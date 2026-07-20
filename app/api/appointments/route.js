@@ -76,6 +76,7 @@ export const POST = withErrorHandling(async (req) => {
     platform: body.platform || '',
     status: body.status || 'Pending',
     'created by': session.username,
+    'created at': new Date().toISOString(),
   };
   await appendRow('Appointments', record);
 
