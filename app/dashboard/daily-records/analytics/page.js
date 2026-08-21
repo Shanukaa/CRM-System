@@ -8,6 +8,7 @@ import AppointmentsEnteredChart from '@/components/charts/AppointmentsEnteredCha
 import AppointmentsVsActivityChart from '@/components/charts/AppointmentsVsActivityChart';
 import TotalActivityAppointmentsChart from '@/components/charts/TotalActivityAppointmentsChart';
 import ActivityVsAppointmentsScatterChart from '@/components/charts/ActivityVsAppointmentsScatterChart';
+import ActivityBreakdownTrendChart from '@/components/charts/ActivityBreakdownTrendChart';
 
 export default function DailyRecordsAnalyticsPage() {
   const [stats, setStats] = useState(null);
@@ -47,6 +48,7 @@ export default function DailyRecordsAnalyticsPage() {
             {stats ? (
               <>
                 <TotalActivityAppointmentsChart data={stats.trend} />
+                <ActivityBreakdownTrendChart data={stats.trend} />
                 <ActivityImpactCard impact={stats.impact} />
                 <ActivityVsAppointmentsScatterChart data={stats.scatter} />
                 <DailyActivityChart data={stats.trend} />

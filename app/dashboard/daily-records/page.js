@@ -6,6 +6,7 @@ import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
 import DailyRecordFormModal from '@/components/DailyRecordFormModal';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import ImportButton from '@/components/ImportButton';
 import { DAILY_RECORD_COLUMNS } from '@/lib/constants';
 import { exportToExcel } from '@/lib/exportClient';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -95,6 +96,23 @@ export default function DailyRecordsPage() {
             <button onClick={loadRows} className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50" title="Refresh">
               <RefreshCw size={16} />
             </button>
+            <ImportButton
+              columns={DAILY_RECORD_COLUMNS.filter((c) => c.key !== 'total')}
+              templateName="daily-records"
+              endpoint="/api/daily-records/import"
+              mapRow={(row) => {
+                const date = row['Date'];
+                if (!date) return null;
+                return {
+                  date,
+                  messages: row['Messages'] || 0,
+                  calls: row['Calls'] || 0,
+                  leads: row['Leads'] || 0,
+                  appointmentsEntered: row['Appointments Entered'] || 0,
+                };
+              }}
+              onImported={loadRows}
+            />
             <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 text-sm border border-slate-200 rounded-xl hover:bg-slate-50">
               <Download size={16} /> Export
             </button>
