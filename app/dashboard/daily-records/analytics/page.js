@@ -2,9 +2,12 @@
 import { useEffect, useState } from 'react';
 import { MessageSquare, Phone, UserPlus, CalendarPlus, Sigma } from 'lucide-react';
 import StatCard from '@/components/StatCard';
+import ActivityImpactCard from '@/components/ActivityImpactCard';
 import DailyActivityChart from '@/components/charts/DailyActivityChart';
 import AppointmentsEnteredChart from '@/components/charts/AppointmentsEnteredChart';
 import AppointmentsVsActivityChart from '@/components/charts/AppointmentsVsActivityChart';
+import TotalActivityAppointmentsChart from '@/components/charts/TotalActivityAppointmentsChart';
+import ActivityVsAppointmentsScatterChart from '@/components/charts/ActivityVsAppointmentsScatterChart';
 
 export default function DailyRecordsAnalyticsPage() {
   const [stats, setStats] = useState(null);
@@ -43,6 +46,9 @@ export default function DailyRecordsAnalyticsPage() {
           <div className="grid grid-cols-1 gap-4">
             {stats ? (
               <>
+                <TotalActivityAppointmentsChart data={stats.trend} />
+                <ActivityImpactCard impact={stats.impact} />
+                <ActivityVsAppointmentsScatterChart data={stats.scatter} />
                 <DailyActivityChart data={stats.trend} />
                 <AppointmentsEnteredChart data={stats.trend} />
                 <AppointmentsVsActivityChart data={stats.trend} />
