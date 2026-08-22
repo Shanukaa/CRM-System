@@ -21,7 +21,7 @@ function getYAxisMax(data) {
 
 export default function TotalActivityAppointmentsChart({
   data,
-  subtitle = 'Total activity vs appointments entered — last 14 days',
+  subtitle = 'Total activity vs appointments entered — last 30 days',
   xAxisInterval = 1,
 }) {
   const yAxisMax = getYAxisMax(data || []);

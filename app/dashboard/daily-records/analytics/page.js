@@ -13,7 +13,7 @@ import ActivityBreakdownTrendChart from '@/components/charts/ActivityBreakdownTr
 export default function DailyRecordsAnalyticsPage() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
-  const [granularity, setGranularity] = useState('monthly'); // 'daily' | 'monthly'
+  const [granularity, setGranularity] = useState('daily'); // 'daily' | 'monthly'
 
   useEffect(() => {
     fetch('/api/daily-records/stats')
@@ -31,7 +31,7 @@ export default function DailyRecordsAnalyticsPage() {
   const isMonthly = granularity === 'monthly';
   const trendData = stats ? (isMonthly ? stats.monthlyTrend : stats.trend) : [];
   const scatterData = stats ? (isMonthly ? stats.monthlyScatter : stats.scatter) : [];
-  const periodLabel = isMonthly ? 'last 12 months' : 'last 14 days';
+  const periodLabel = isMonthly ? 'last 12 months' : 'last 30 days';
   const xAxisInterval = isMonthly ? 0 : 1;
 
   return (

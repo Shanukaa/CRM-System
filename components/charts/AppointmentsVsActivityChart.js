@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 export default function AppointmentsVsActivityChart({
   data,
-  subtitle = 'Appointments entered compared to total activity (messages + calls + leads) — last 14 days',
+  subtitle = 'Appointments entered compared to total activity (messages + calls + leads) — last 30 days',
   xAxisInterval = 1,
 }) {
   return (

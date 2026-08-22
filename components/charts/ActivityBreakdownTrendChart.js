@@ -3,7 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export default function ActivityBreakdownTrendChart({
   data,
-  subtitle = 'Daily breakdown of every activity type against appointments entered — last 14 days',
+  subtitle = 'Daily breakdown of every activity type against appointments entered — last 30 days',
   xAxisInterval = 1,
 }) {
   return (

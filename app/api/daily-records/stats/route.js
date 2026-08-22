@@ -18,10 +18,10 @@ export const GET = withErrorHandling(async () => {
     total: sum('total'),
   };
 
-  // 14-day trend: messages/calls/leads/appointments entered per day
-  const days = Array.from({ length: 14 }, (_, i) => {
+  // 30-day trend: messages/calls/leads/appointments entered per day
+  const days = Array.from({ length: 30 }, (_, i) => {
     const d = new Date();
-    d.setDate(d.getDate() - (13 - i));
+    d.setDate(d.getDate() - (29 - i));
     return d;
   });
   const byDateKey = new Map();

@@ -19,7 +19,7 @@ function getYAxisMax(data) {
   return max;
 }
 
-export default function AppointmentsEnteredChart({ data, subtitle = 'Appointments entered per day — last 14 days', xAxisInterval = 1 }) {
+export default function AppointmentsEnteredChart({ data, subtitle = 'Appointments entered per day — last 30 days', xAxisInterval = 1 }) {
   const yAxisMax = getYAxisMax(data);
 
   return (

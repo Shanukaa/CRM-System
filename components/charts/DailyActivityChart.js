@@ -1,7 +1,7 @@
 'use client';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-export default function DailyActivityChart({ data, subtitle = 'Total activity (messages + calls + leads) — last 14 days', xAxisInterval = 1 }) {
+export default function DailyActivityChart({ data, subtitle = 'Total activity (messages + calls + leads) — last 30 days', xAxisInterval = 1 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-soft p-5">
       <p className="text-sm font-semibold text-slate-700">Daily Activity</p>
