@@ -13,7 +13,7 @@ import ActivityBreakdownTrendChart from '@/components/charts/ActivityBreakdownTr
 export default function DailyRecordsAnalyticsPage() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
-  const [granularity, setGranularity] = useState('daily'); // 'daily' | 'monthly'
+  const [granularity, setGranularity] = useState('monthly'); // 'daily' | 'monthly'
 
   useEffect(() => {
     fetch('/api/daily-records/stats')
