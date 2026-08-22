@@ -9,39 +9,46 @@ export default function Sidebar({ user }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const isAdmin = user.usertype === 'admin';
+  // The "social" role only ever has one page to see, so give it a single
+  // top-level link instead of the full nav + collapsible groups.
+  const isSocial = user.usertype === 'social';
 
-  const links = [
-    { href: isAdmin ? '/dashboard' : '/dashboard/welcome', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/dashboard/clients', label: 'Client List', icon: Users },
-    { href: '/dashboard/appointments', label: 'Appointment List', icon: CalendarCheck },
-  ];
+  const links = isSocial
+    ? [{ href: '/dashboard/daily-records/analytics', label: 'Daily Records Analytics', icon: NotebookPen }]
+    : [
+        { href: isAdmin ? '/dashboard' : '/dashboard/welcome', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/dashboard/clients', label: 'Client List', icon: Users },
+        { href: '/dashboard/appointments', label: 'Appointment List', icon: CalendarCheck },
+      ];
   if (isAdmin) {
     links.push({ href: '/dashboard/users', label: 'Users', icon: UserCog });
   }
 
-  const groups = [
-    {
-      key: 'leads',
-      label: 'Lead Form',
-      icon: ClipboardList,
-      basePath: '/dashboard/leads',
-      links: [
-        ...(isAdmin ? [{ href: '/dashboard/leads/analytics', label: 'Analytics' }] : []),
-        { href: '/dashboard/leads/fat-contouring', label: 'FAT Contouring' },
-        { href: '/dashboard/leads/body-fillers', label: 'Body Fillers' },
-      ],
-    },
-    {
-      key: 'dailyRecords',
-      label: 'Daily Records',
-      icon: NotebookPen,
-      basePath: '/dashboard/daily-records',
-      links: [
-        ...(isAdmin ? [{ href: '/dashboard/daily-records/analytics', label: 'Analytics' }] : []),
-        { href: '/dashboard/daily-records', label: 'Records' },
-      ],
-    },
-  ];
+  const groups = isSocial
+    ? []
+    : [
+        {
+          key: 'leads',
+          label: 'Lead Form',
+          icon: ClipboardList,
+          basePath: '/dashboard/leads',
+          links: [
+            ...(isAdmin ? [{ href: '/dashboard/leads/analytics', label: 'Analytics' }] : []),
+            { href: '/dashboard/leads/fat-contouring', label: 'FAT Contouring' },
+            { href: '/dashboard/leads/body-fillers', label: 'Body Fillers' },
+          ],
+        },
+        {
+          key: 'dailyRecords',
+          label: 'Daily Records',
+          icon: NotebookPen,
+          basePath: '/dashboard/daily-records',
+          links: [
+            ...(isAdmin ? [{ href: '/dashboard/daily-records/analytics', label: 'Analytics' }] : []),
+            { href: '/dashboard/daily-records', label: 'Records' },
+          ],
+        },
+      ];
 
   const [openGroups, setOpenGroups] = useState(() =>
     Object.fromEntries(groups.map((g) => [g.key, pathname.startsWith(g.basePath)]))

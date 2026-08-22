@@ -13,6 +13,7 @@ import ActivityBreakdownTrendChart from '@/components/charts/ActivityBreakdownTr
 export default function DailyRecordsAnalyticsPage() {
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
+  const [granularity, setGranularity] = useState('daily'); // 'daily' | 'monthly'
 
   useEffect(() => {
     fetch('/api/daily-records/stats')
@@ -27,9 +28,37 @@ export default function DailyRecordsAnalyticsPage() {
       .catch(() => setError('Failed to load analytics'));
   }, []);
 
+  const isMonthly = granularity === 'monthly';
+  const trendData = stats ? (isMonthly ? stats.monthlyTrend : stats.trend) : [];
+  const scatterData = stats ? (isMonthly ? stats.monthlyScatter : stats.scatter) : [];
+  const periodLabel = isMonthly ? 'last 12 months' : 'last 14 days';
+  const xAxisInterval = isMonthly ? 0 : 1;
+
   return (
     <div>
-      <h1 className="text-xl font-bold text-slate-800 mb-1">Daily Records Analytics</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-1">
+        <h1 className="text-xl font-bold text-slate-800">Daily Records Analytics</h1>
+        <div className="inline-flex items-center bg-white border border-slate-200 rounded-xl p-1 self-start">
+          <button
+            type="button"
+            onClick={() => setGranularity('daily')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              !isMonthly ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Daily
+          </button>
+          <button
+            type="button"
+            onClick={() => setGranularity('monthly')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              isMonthly ? 'bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Monthly
+          </button>
+        </div>
+      </div>
       <p className="text-sm text-slate-500 mb-6">Performance overview across all logged daily records.</p>
 
       {error ? (
@@ -47,13 +76,36 @@ export default function DailyRecordsAnalyticsPage() {
           <div className="grid grid-cols-1 gap-4">
             {stats ? (
               <>
-                <TotalActivityAppointmentsChart data={stats.trend} />
-                <ActivityBreakdownTrendChart data={stats.trend} />
+                <TotalActivityAppointmentsChart
+                  data={trendData}
+                  subtitle={`Total activity vs appointments entered — ${periodLabel}`}
+                  xAxisInterval={xAxisInterval}
+                />
+                <ActivityBreakdownTrendChart
+                  data={trendData}
+                  subtitle={`${isMonthly ? 'Monthly' : 'Daily'} breakdown of every activity type against appointments entered — ${periodLabel}`}
+                  xAxisInterval={xAxisInterval}
+                />
                 <ActivityImpactCard impact={stats.impact} />
-                <ActivityVsAppointmentsScatterChart data={stats.scatter} />
-                <DailyActivityChart data={stats.trend} />
-                <AppointmentsEnteredChart data={stats.trend} />
-                <AppointmentsVsActivityChart data={stats.trend} />
+                <ActivityVsAppointmentsScatterChart
+                  data={scatterData}
+                  subtitle={`Each dot is one ${isMonthly ? 'month' : 'day'} — total activity (messages + calls + leads) against appointments booked in that ${isMonthly ? 'month' : 'day'}`}
+                />
+                <DailyActivityChart
+                  data={trendData}
+                  subtitle={`Total activity (messages + calls + leads) — ${periodLabel}`}
+                  xAxisInterval={xAxisInterval}
+                />
+                <AppointmentsEnteredChart
+                  data={trendData}
+                  subtitle={`Appointments entered per ${isMonthly ? 'month' : 'day'} — ${periodLabel}`}
+                  xAxisInterval={xAxisInterval}
+                />
+                <AppointmentsVsActivityChart
+                  data={trendData}
+                  subtitle={`Appointments entered compared to total activity (messages + calls + leads) — ${periodLabel}`}
+                  xAxisInterval={xAxisInterval}
+                />
               </>
             ) : (
               <div className="h-[240px] flex items-center justify-center text-sm text-slate-400 bg-white rounded-2xl border border-slate-100">

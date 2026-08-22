@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, updateRowById, deleteRowById } from '@/lib/googleSheets';
-import { requireSession, requireAdmin } from '@/lib/apiAuth';
+import { requireStandardSession, requireAdmin } from '@/lib/apiAuth';
 import { withErrorHandling } from '@/lib/withErrorHandling';
 
 export const PUT = withErrorHandling(async (req, { params }) => {
-  const session = await requireSession();
+  const session = await requireStandardSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();

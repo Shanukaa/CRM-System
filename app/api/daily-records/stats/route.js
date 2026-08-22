@@ -77,12 +77,49 @@ export const GET = withErrorHandling(async () => {
       appointmentsEntered: d.appointmentsEntered,
     }));
 
+  // Monthly trend: same fields aggregated by calendar month, for the last 12 months.
+  const monthKeyOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const monthsList = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date();
+    d.setDate(1); // pin to the 1st so month subtraction never rolls over unexpectedly
+    d.setMonth(d.getMonth() - (11 - i));
+    return d;
+  });
+  const byMonthKey = new Map();
+  allDays.forEach((d) => {
+    const dateObj = new Date(d.date);
+    if (isNaN(dateObj)) return;
+    const key = monthKeyOf(dateObj);
+    const existing = byMonthKey.get(key) || { messages: 0, calls: 0, leads: 0, appointmentsEntered: 0 };
+    existing.messages += d.messages;
+    existing.calls += d.calls;
+    existing.leads += d.leads;
+    existing.appointmentsEntered += d.appointmentsEntered;
+    byMonthKey.set(key, existing);
+  });
+  const monthlyTrend = monthsList.map((d) => {
+    const key = monthKeyOf(d);
+    const entry = byMonthKey.get(key) || { messages: 0, calls: 0, leads: 0, appointmentsEntered: 0 };
+    const activityTotal = entry.messages + entry.calls + entry.leads;
+    return { date: d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }), ...entry, activityTotal };
+  });
+  const monthlyScatter = Array.from(byMonthKey.entries())
+    .map(([key, v]) => {
+      const [y, m] = key.split('-').map(Number);
+      const dateLabel = new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      const activityTotal = v.messages + v.calls + v.leads;
+      return { date: dateLabel, activityTotal, appointmentsEntered: v.appointmentsEntered };
+    })
+    .filter((d) => d.activityTotal > 0 || d.appointmentsEntered > 0);
+
   return NextResponse.json({
     totals,
     trend,
+    monthlyTrend,
     recordCount: rows.length,
     impact: { correlation, strongestDriver, avgActivityPerAppointment },
     scatter,
+    monthlyScatter,
   });
 });
 

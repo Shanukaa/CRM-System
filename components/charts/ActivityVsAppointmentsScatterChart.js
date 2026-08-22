@@ -32,7 +32,10 @@ function linearRegression(points) {
   return { slope, intercept };
 }
 
-export default function ActivityVsAppointmentsScatterChart({ data }) {
+export default function ActivityVsAppointmentsScatterChart({
+  data,
+  subtitle = 'Each dot is one day — total activity (messages + calls + leads) against appointments booked that day',
+}) {
   const points = data || [];
   const reg = linearRegression(points);
 
@@ -50,9 +53,7 @@ export default function ActivityVsAppointmentsScatterChart({ data }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-soft p-5">
       <p className="text-sm font-semibold text-slate-700">Activity vs Appointments</p>
-      <p className="text-xs text-slate-400 mb-4">
-        Each dot is one day — total activity (messages + calls + leads) against appointments booked that day
-      </p>
+      <p className="text-xs text-slate-400 mb-4">{subtitle}</p>
       <ResponsiveContainer width="100%" height={280}>
         <ComposedChart margin={{ top: 5, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />

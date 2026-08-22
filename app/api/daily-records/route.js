@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows, appendRow } from '@/lib/googleSheets';
-import { requireSession } from '@/lib/apiAuth';
+import { requireStandardSession } from '@/lib/apiAuth';
 import { withErrorHandling } from '@/lib/withErrorHandling';
 import { v4 as uuidv4 } from 'uuid';
 
 const PAGE_SIZE = 15;
 
 export const GET = withErrorHandling(async (req) => {
-  const session = await requireSession();
+  const session = await requireStandardSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
@@ -40,7 +40,7 @@ export const GET = withErrorHandling(async (req) => {
 });
 
 export const POST = withErrorHandling(async (req) => {
-  const session = await requireSession();
+  const session = await requireStandardSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();

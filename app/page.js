@@ -6,5 +6,7 @@ export default async function Home() {
   const token = cookies().get('session')?.value;
   const session = token ? await verifySessionToken(token) : null;
   if (!session) redirect('/login');
-  redirect(session.usertype === 'admin' ? '/dashboard' : '/dashboard/welcome');
+  if (session.usertype === 'admin') redirect('/dashboard');
+  if (session.usertype === 'social') redirect('/dashboard/daily-records/analytics');
+  redirect('/dashboard/welcome');
 }

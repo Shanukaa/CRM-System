@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getSheetRows } from '@/lib/googleSheets';
-import { requireSession } from '@/lib/apiAuth';
+import { requireStandardSession } from '@/lib/apiAuth';
 import { withErrorHandling } from '@/lib/withErrorHandling';
 
 export const GET = withErrorHandling(async (req) => {
-  const session = await requireSession();
+  const session = await requireStandardSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const type = new URL(req.url).searchParams.get('type');

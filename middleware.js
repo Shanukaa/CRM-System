@@ -6,10 +6,22 @@ export async function middleware(req) {
   const session = token ? await verifySessionToken(token) : null;
   const { pathname } = req.nextUrl;
 
+  const DAILY_RECORDS_ANALYTICS = '/dashboard/daily-records/analytics';
+
   if (pathname.startsWith('/dashboard')) {
     if (!session) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
+
+    // The "social" role is locked down to Daily Records Analytics only —
+    // every other /dashboard/* route bounces back there.
+    if (session.usertype === 'social') {
+      if (pathname !== DAILY_RECORDS_ANALYTICS) {
+        return NextResponse.redirect(new URL(DAILY_RECORDS_ANALYTICS, req.url));
+      }
+      return NextResponse.next();
+    }
+
     if (pathname.startsWith('/dashboard/users') && session.usertype !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
     }
@@ -19,13 +31,15 @@ export async function middleware(req) {
     if (pathname.startsWith('/dashboard/leads/analytics') && session.usertype !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
     }
-    if (pathname.startsWith('/dashboard/daily-records/analytics') && session.usertype !== 'admin') {
+    if (pathname.startsWith(DAILY_RECORDS_ANALYTICS) && session.usertype !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard/welcome', req.url));
     }
   }
 
   if (pathname === '/login' && session) {
-    return NextResponse.redirect(new URL(session.usertype === 'admin' ? '/dashboard' : '/dashboard/welcome', req.url));
+    const home =
+      session.usertype === 'admin' ? '/dashboard' : session.usertype === 'social' ? DAILY_RECORDS_ANALYTICS : '/dashboard/welcome';
+    return NextResponse.redirect(new URL(home, req.url));
   }
 
   return NextResponse.next();
